@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Link details{% endblock %}
+{% block page_title %}Link details{% endblock %}
+{% block page_subtitle %}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/links.css' %}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="breadcrumb">
+  <a href="{% url 'links:my_links' %}">My claim links</a> <span>/</span> <span>{{ link.item_label|default:"₦500 Airtime" }}</span>
+</div>
+
+<div class="detail-header-card">
+  <div class="detail-header-top">
+    <div>
+      <h2>{{ link.item_label }} · {{ link.network.name }}</h2>
+      <div class="sub">Created {{ link.created_at|date:"d M Y, g:i A"|default:"12 Jul 2026, 3:40 PM" }}</div>
+    </div>
+    <span class="status-badge status-{{ link.status|default:'active' }}">{{ link.get_status_display|default:link.status|default:"Active" }}</span>
+  </div>
+
+  <div class="qr-and-link">
+    <div class="qr-block">
+      <div id="qrCode" class="qr-box-real" role="img" aria-label="QR code to claim this link"></div>
+      <noscript>
+        <img
+          alt="QR code to claim this link"
+          class="qr-box-real"
+          width="208" height="208"
+        >
+      </noscript>
+      <a href="#" id="qrDownloadLink" download="beacon-{{ link.link_id }}.png" class="qr-download-link">Download</a>
+    </div>
+    <div class="detail-link-info">
+      <div class="link-url-row" style="margin-bottom:10px;">
+        <span>{{ link.share_url }}</span>
+        <button type="button" class="copy-btn" id="copyLinkBtn" data-copy="{{ link.share_url }}">Copy link</button>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:{{ link.percent_claimed }}%;"></div>
+      </div>
+      <div class="progress-label">
+        <span>{{ link.used_slots }} of {{ link.total_slots }} slots claimed</span>
+        <span>Expires in {{ link.expires_in_days }} Days</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="detail-info-grid">
+  <div class="info-tile"><div class="lab">Service</div><div class="val">{{ link.service_type|capfirst }}</div></div>
+  <div class="info-tile"><div class="lab">Value per slot</div><div class="val">₦{{ link.amount_per_slot }}</div></div>
+  <div class="info-tile"><div class="lab">Total reserved</div><div class="val">₦{{ link.total_reserved }}</div></div>
+  <div class="info-tile"><div class="lab">Total slots</div><div class="val">{{ link.total_slots }}</div></div>
+  <div class="info-tile"><div class="lab">Slots claimed</div><div class="val">{{ link.used_slots }}</div></div>
+  <div class="info-tile"><div class="lab">Expiry date</div><div class="val">{{ link.expiry_date|date:"d M Y" }}</div></div>
+</div>
+
+{% if link.note %}
+<div class="note-bubble" style="max-width:520px; margin-bottom:24px;">
+  <span class="lab">Note attached to this link</span>
+  "{{ link.note }}"
+</div>
+{% endif %}
+
+<div class="section-title">
+  <h2>Claim history</h2>
+</div>
+
+<div class="claim-log-table">
+  <div class="claim-log-row head">
+    <div></div>
+    <div>Claimed by</div>
+    <div>When</div>
+  </div>
+  {% for claim in link.claimed_slots %}
+  <div class="claim-log-row">
+    <div class="claim-log-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <div class="claim-log-desc">
+      <div class="t1">{{ claim.masked_phone }}</div>
+      <div class="t2">Delivered</div>
+    </div>
+    <div class="tx-amount pos">{{ claim.claimed_at|date:"d M, g:i A"|default:"12 Jul, 4:02 PM" }}</div>
+  </div>
+  {% empty %}
+  <div class="claim-log-row">
+    <div></div>
+    <div class="claim-log-desc"><div class="t1" style="color:var(--text-dimmer);">No one has claimed this link yet.</div></div>
+    <div></div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="danger-zone">
+  <div class="dz-text">
+    <h4>Disable this link</h4>
+    <p>Unclaimed slots stop working immediately. This can't be undone, but reserved funds for unclaimed slots are returned to your wallet.</p>
+  </div>
+  <form method="post" action="{% url 'links:disable' link.link_id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger" {% if link.status != 'active' %}disabled{% endif %}>Disable link</button>
+  </form>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js_/qrcode.min.js' %}"></script>
+<script>
+  document.getElementById('copyLinkBtn').addEventListener('click', function(){
+    navigator.clipboard.writeText('https://' + this.dataset.copy).then(() => {
+      const original = this.textContent;
+      this.textContent = 'Copied!';
+      setTimeout(() => this.textContent = original, 1500);
+    });
+  });
+
+  // Rendered entirely client-side — the server never generates an image
+  // for this unless JS is unavailable (see the <noscript> fallback above).
+  (function(){
+    var container = document.getElementById('qrCode');
+    var downloadLink = document.getElementById('qrDownloadLink');
+    if (!container || typeof QRCode === 'undefined') return;
+
+    var shareUrl = "{{ link.share_url|escapejs }}";
+
+    new QRCode(container, {
+      text: shareUrl,
+      width: 200,
+      height: 200,
+      colorDark: '#12162E',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+
+    var canvas = container.querySelector('canvas');
+    if (downloadLink && canvas) {
+      downloadLink.addEventListener('click', function(e){
+        e.preventDefault();
+        var link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = "beacon-{{ link.link_id }}.png";
+        link.click();
+      });
+    } else if (downloadLink) {
+      // Library rendered an <img> instead of <canvas> (older-browser
+      // fallback inside qrcodejs itself) — nothing to export, hide it.
+      downloadLink.style.display = 'none';
+    }
+  })();
+</script>
+{% endblock %}

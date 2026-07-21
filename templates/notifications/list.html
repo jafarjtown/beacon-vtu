@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+{% block title %}Notifications{% endblock %}
+{% block page_title %}Notifications{% endblock page_title %}
+{% block page_subtitle %}<p>All activities.</p>{% endblock %}
+{% block content %}
+<div class="app-content">
+    <div class="notifications-page">
+
+        <div class="section-title notifications-header">
+           
+
+            {% if notifications %}
+            <form method="post" action="{% url 'notifications:mark_all_read' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-ghost btn-sm mark-all-btn">
+                    <i class="fas fa-check-double"></i>
+                    Mark all read
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+        {% if notifications %}
+        <div class="notifications-list">
+            {% for notif in notifications %}
+            <div class="notification-card {% if not notif.is_read %}unread{% endif %}">
+
+                <div class="notification-icon
+                    {% if notif.notification_type == 'success' %}success
+                    {% elif notif.notification_type == 'error' %}error
+                    {% elif notif.notification_type == 'warning' %}warning
+                    {% else %}info{% endif %}">
+                    <i class="fas fa-
+                        {% if notif.notification_type == 'success' %}check
+                        {% elif notif.notification_type == 'error' %}times
+                        {% elif notif.notification_type == 'warning' %}exclamation
+                        {% else %}info{% endif %}">
+                    </i>
+                </div>
+
+                <div class="notification-body">
+                    <div class="notification-top">
+                        <h3>{{ notif.title }}</h3>
+                        <span class="notification-time">
+                            {{ notif.created_at|timesince }} ago
+                        </span>
+                    </div>
+
+                    <p>{{ notif.message }}</p>
+
+                    {% if not notif.is_read %}
+                    <form method="post" action="{% url 'notifications:mark_read' notif.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="notification-action">
+                            Mark as read
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+
+                {% if not notif.is_read %}
+                <span class="unread-dot" title="Unread"></span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-bell-slash"></i>
+            </div>
+            <h3>No notifications yet</h3>
+            <p>You're all caught up. New notifications will appear here.</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<style>
+.notifications-page {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.notifications-header {
+    margin-bottom: 24px;
+    align-items: flex-end;
+}
+
+.page-subtitle {
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.mark-all-btn {
+    width: auto;
+    white-space: nowrap;
+}
+
+.notifications-list {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.notification-card {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--border);
+    transition: background .2s;
+}
+
+.notification-card:last-child {
+    border-bottom: none;
+}
+
+.notification-card:hover {
+    background: var(--bg-elev-2);
+}
+
+.notification-card.unread {
+    background: rgba(255, 176, 32, 0.045);
+}
+
+.notification-card.unread:hover {
+    background: rgba(255, 176, 32, 0.08);
+}
+
+.notification-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.notification-icon.success {
+    background: rgba(0, 217, 163, 0.12);
+    color: var(--mint);
+}
+
+.notification-icon.error {
+    background: rgba(255, 107, 107, 0.12);
+    color: var(--danger);
+}
+
+.notification-icon.warning {
+    background: rgba(255, 176, 32, 0.12);
+    color: var(--amber);
+}
+
+.notification-icon.info {
+    background: rgba(124, 108, 255, 0.12);
+    color: var(--violet);
+}
+
+.notification-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 5px;
+}
+
+.notification-top h3 {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.notification-time {
+    flex-shrink: 0;
+    color: var(--text-dimmer);
+    font-family: 'IBM Plex Mono';
+    font-size: 10.5px;
+    white-space: nowrap;
+}
+
+.notification-body p {
+    color: var(--text-dim);
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.notification-action {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--amber);
+    font-size: 12.5px;
+    font-weight: 500;
+}
+
+.notification-action:hover {
+    text-decoration: underline;
+}
+
+.unread-dot {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    margin-top: 7px;
+    border-radius: 50%;
+    background: var(--amber);
+}
+
+.empty-state {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 70px 24px;
+    text-align: center;
+}
+
+.empty-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-elev-2);
+    color: var(--text-dimmer);
+    font-size: 25px;
+}
+
+.empty-state h3 {
+    font-size: 17px;
+    margin-bottom: 5px;
+}
+
+.empty-state p {
+    color: var(--text-dim);
+    font-size: 13px;
+}
+
+@media (max-width: 640px) {
+    .notifications-header {
+        align-items: flex-start;
+        gap: 16px;
+        flex-direction: column;
+    }
+
+    .mark-all-btn {
+        width: auto;
+    }
+
+    .notification-card {
+        padding: 17px 16px;
+        gap: 12px;
+    }
+
+    .notification-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+
+    .notification-top {
+        display: block;
+    }
+
+    .notification-time {
+        display: block;
+        margin-top: 4px;
+    }
+}
+</style>
+{% endblock %}

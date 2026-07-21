@@ -1,0 +1,66 @@
+<div id="beaconSplash" class="beacon-splash" aria-hidden="true">
+  <div class="beacon-splash-mark">
+    <span></span><span></span><span></span><span></span>
+  </div>
+</div>
+
+<style>
+  .beacon-splash{
+    position:fixed; inset:0; z-index:9999;
+    background:#0B0E1F;
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity .35s ease, visibility .35s ease;
+  }
+  .beacon-splash.beacon-splash-hidden{
+    opacity:0; visibility:hidden; pointer-events:none;
+  }
+  .beacon-splash-mark{ display:flex; align-items:flex-end; gap:7px; height:56px; }
+  .beacon-splash-mark span{
+    width:11px; border-radius:4px;
+    background:linear-gradient(180deg, #FFB020, #00D9A3);
+    animation:beaconSplashPulse 1s ease-in-out infinite;
+  }
+  .beacon-splash-mark span:nth-child(1){ height:35%; animation-delay:0s; }
+  .beacon-splash-mark span:nth-child(2){ height:65%; animation-delay:.12s; }
+  .beacon-splash-mark span:nth-child(3){ height:100%; animation-delay:.24s; }
+  .beacon-splash-mark span:nth-child(4){ height:78%; animation-delay:.36s; }
+  @keyframes beaconSplashPulse{
+    0%,100%{ opacity:.4; transform:scaleY(.85); }
+    50%{ opacity:1; transform:scaleY(1); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .beacon-splash-mark span{ animation:none; opacity:1; }
+  }
+</style>
+
+<script>
+  (function () {
+    var splash = document.getElementById('beaconSplash');
+    if (!splash) return;
+
+    if (sessionStorage.getItem('beacon_splash_shown')) {
+      splash.remove();
+      return;
+    }
+
+    // Shown for at least this long even on a fast/cached load — a splash
+    // that flashes for 40ms reads as a glitch, not a boot screen.
+    var MIN_VISIBLE_MS = 500;
+    var shownAt = Date.now();
+
+    function hideSplash() {
+      sessionStorage.setItem('beacon_splash_shown', '1');
+      var wait = Math.max(MIN_VISIBLE_MS - (Date.now() - shownAt), 0);
+      setTimeout(function () {
+        splash.classList.add('beacon-splash-hidden');
+        setTimeout(function () { splash.remove(); }, 400);
+      }, wait);
+    }
+
+    if (document.readyState === 'complete') {
+      hideSplash();
+    } else {
+      window.addEventListener('load', hideSplash);
+    }
+  })();
+</script>

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}<p>Welcome back, {{ user.full_name|default:"there" }}.</p>{% endblock %}
+
+{% block content %}
+
+<div class="dash-grid">
+  <div class="balance-card">
+    <div class="label">Wallet balance</div>
+    <div class="amount">₦{{ wallet.balance|intcomma }}</div>
+    <div class="balance-actions">
+      <a href="{% url 'wallet:fund' %}" class="btn btn-primary">Fund wallet</a>
+      <a href="{% url 'services:list' %}" class="btn btn-ghost">Buy a service</a>
+    </div>
+  </div>
+
+  <div class="stat-mini-grid">
+    <div class="stat-mini">
+      <div class="top">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg></div>
+      </div>
+      <div class="val">₦{{ stats.month_spend|intcomma }}</div>
+      <div class="lab">Spent this month</div>
+    </div>
+    <div class="stat-mini">
+      <div class="top">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg></div>
+      </div>
+      <div class="val">{{ stats.active_links|default:"0" }}</div>
+      <div class="lab">Active claim links</div>
+    </div>
+    <div class="stat-mini">
+      <div class="top">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg></div>
+      </div>
+      <div class="val">{{ stats.tx_count|default:"0" }}</div>
+      <div class="lab">Purchases this month</div>
+    </div>
+    <div class="stat-mini">
+      <div class="top">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div>
+      </div>
+      <div class="val">{{ stats.success_rate|default:"100%" }}</div>
+      <div class="lab">Delivery success rate</div>
+    </div>
+  </div>
+</div>
+
+<div class="quick-actions">
+  <div class="section-title"><h2>Quick actions</h2></div>
+  <div class="qa-grid">
+    <a href="{% url 'services:list' %}?type=airtime" class="qa-item">
+      <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+      <span>Airtime</span>
+    </a>
+    <a href="{% url 'services:list' %}?type=data" class="qa-item">
+      <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20a8 8 0 100-16 8 8 0 000 16z"/><path d="M12 16a4 4 0 100-8 4 4 0 000 8z"/></svg></div>
+      <span>Data</span>
+    </a>
+    <a href="{% url 'services:list' %}?type=electricity" class="qa-item">
+      <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg></div>
+      <span>Electricity</span>
+    </a>
+    <a href="{% url 'services:list' %}?type=cable" class="qa-item">
+      <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M9 3l3 4 3-4"/></svg></div>
+      <span>Cable TV</span>
+    </a>
+    <a href="{% url 'services:list' %}?type=exam" class="qa-item">
+      <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+      <span>Exam pin</span>
+    </a>
+    <a href="{% url 'links:my_links' %}?new=1" class="qa-item">
+      <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg></div>
+      <span>Claim link</span>
+    </a>
+  </div>
+</div>
+
+<div class="recent-tx">
+  <div class="section-title">
+    <h2>Recent transactions</h2>
+    <a href="{% url 'transactions:history' %}">View all →</a>
+  </div>
+
+  <div class="tx-table">
+    <div class="tx-row head">
+      <div></div>
+      <div>Description</div>
+      <div class="col-status">Status</div>
+      <div>Amount</div>
+    </div>
+
+    {% for tx in recent_transactions %}
+      {% include "partials/transaction.html" with tx=tx %}
+    {% empty %}
+    <div class="tx-row">
+      <div></div>
+      <div class="tx-desc"><div class="t1" style="color:var(--text-dimmer);">No transactions yet — your first purchase will show up here.</div></div>
+      <div class="col-status"></div>
+      <div></div>
+    </div>
+    {% endfor %}
+  </div>
+  
+</div>
+
+{% endblock %}

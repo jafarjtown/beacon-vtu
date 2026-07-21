@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}My Wallet{% endblock %}
+{% block page_title %}My Wallet{% endblock %}
+{% block page_subtitle %}<p>Your balance and recent funding.</p>{% endblock %}
+
+{% block content %}
+
+<div class="dash-grid">
+  <div class="balance-card">
+    <div class="label">Available balance</div>
+    <div class="amount">₦{{ wallet.balance|intcomma }}</div>
+    <div class="balance-actions">
+      <a href="{% url 'wallet:fund' %}" class="btn btn-primary">Fund wallet</a>
+    </div>
+  </div>
+
+  <div class="stat-mini-grid" style="grid-template-columns:1fr;">
+    <div class="stat-mini">
+      <div class="top">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
+      </div>
+      <div class="val">₦{{ wallet.total_funded|intcomma }}</div>
+      <div class="lab">Total funded</div>
+    </div>
+    <div class="stat-mini">
+      <div class="top">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg></div>
+      </div>
+      <div class="val">₦{{ wallet.total_spent|intcomma }}</div>
+      <div class="lab">Total spent</div>
+    </div>
+  </div>
+</div>
+
+<div class="recent-tx">
+  <div class="section-title">
+    <h2>Recent funding</h2>
+    <a href="{% url 'wallet:funding_history' %}">View all →</a>
+  </div>
+
+  <div class="tx-table">
+    <div class="tx-row head">
+      <div></div>
+      <div>Reference</div>
+      <div class="col-status">Status</div>
+      <div>Amount</div>
+    </div>
+
+    {% for fund in funding_history %}
+    <div class="tx-row">
+      <div class="tx-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </div>
+      <div class="tx-desc">
+        <div class="t1">{{ fund.request_id }}</div>
+        <div class="t2">{{ fund.created_at|date:"d M Y" }}</div>
+      </div>
+      <div class="col-status">
+        <span class="badge badge-{% if fund.status == 'confirmed' %}success{% elif fund.status == 'pending' %}pending{% else %}failed{% endif %}">
+          {{ fund.get_status_display }}
+        </span>
+      </div>
+      <div class="tx-amount pos">+₦{{ fund.amount|intcomma }}</div>
+    </div>
+    {% empty %}
+    <div class="tx-row">
+      <div></div>
+      <div class="tx-desc"><div class="t1" style="color:var(--text-dimmer);">No funding history yet — your first transfer will show up here.</div></div>
+      <div class="col-status"></div>
+      <div></div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if not funding_history %}
+    <div style="text-align:center; margin-top:20px;">
+      <a href="{% url 'wallet:fund' %}" class="btn btn-primary">Fund wallet</a>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

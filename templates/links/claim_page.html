@@ -1,0 +1,184 @@
+{% extends "base_public.html" %}
+{% load static %}
+
+{% block title %}You've been sent something · Beacon{% endblock %}
+
+{% block content %}
+<div class="claim-shell">
+
+  <div class="claim-hero-card">
+    <div class="claim-badge"><span>●</span> No account needed</div>
+
+    <div class="gift-icon-ring">
+      <div class="ring"></div><div class="ring"></div>
+      <div class="gift-icon-core">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+      </div>
+    </div>
+
+    <h1>You've been sent {{ link.item_label }}</h1>
+    <p class="from">from <b>{{ link.sender_name|default:"a Beacon user" }}</b></p>
+
+    <div class="offer-pill">
+      <span class="sw" style="background:{{ link.network_color|default:'#FFCC08' }};">{{ link.provider.0|default:"M" }}</span>
+      {{ link.provider }} · {{ link.item_label }}
+    </div>
+
+    <div class="claim-meta-row">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg> {{ link.used_slots }} of {{ link.total_slots }} slots left</span>
+      <span class="{% if link. %}warn{% endif %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Expires in {{ link.expires_in_days }} Days</span>
+    </div>
+  </div>
+
+  {% if link.notes %}
+  <div class="note-bubble">
+    <span class="lab">Note from sender</span>
+    "{{ link.notes }}"
+  </div>
+  {% endif %}
+
+  <div class="claim-form-card">
+    {% if form.non_field_errors %}
+      <div class="alert alert-error non-field-errors">
+        {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'links:claim' link.link_id %}" novalidate>
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="id_phone_number">Phone number to receive this</label>
+        <input
+          type="tel"
+          name="phone_number"
+          id="id_phone_number"
+          class="form-input {% if form.phone_number.errors %}has-error{% endif %}"
+          placeholder="0803 123 4567"
+          value="{{ form.phone_number.value|default:'' }}"
+          required
+          autofocus
+        >
+        <div id="phone-error" class="field-error">{{ error }}</div>
+        
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%;">Confirm &amp; claim →</button>
+    </form>
+
+    <div class="pill-trust">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg> Instant delivery</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Secure link</span>
+    </div>
+  </div>
+
+</div>
+<script>
+  document.querySelector("#id_phone_number").addEventListener("input", verifyPhone)
+  let phoneVerificationRequest = 0;
+
+async function verifyPhone(e) {
+  
+    const phoneError = document.querySelector("#phone-error");
+    const pinTrigger = document.querySelector("button");
+
+    
+    // Always disable PIN until verification succeeds
+    if (pinTrigger) {
+        pinTrigger.disabled = true;
+    }
+
+    if (!phoneError) {
+        console.error("Phone error element not found.");
+        return;
+    }
+    
+    // Remove spaces and other non-numeric characters
+    const phone = e.target.value.replace(/\D/g, "");
+
+    // Optional: keep the input value clean
+    e.target.value = phone;
+
+    // Validate provider
+
+    const providerId = "{{ link.network.api_id }}"
+    // Validate phone number length
+    if (phone.length < 11) {
+        phoneError.hidden = true;
+        return;
+    }
+
+    // Generate a unique request ID
+    const requestId = ++phoneVerificationRequest;
+
+    phoneError.style.color = "green";
+    phoneError.textContent = "Verifying...";
+    phoneError.hidden = false;
+
+    try {
+        const params = new URLSearchParams({
+            beneficiary: phone,
+            provider_id: providerId
+        });
+
+        const response = await fetch(
+            `{% url 'services:validate' %}?${params.toString()}`,
+            {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json"
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        // Ignore old requests
+        if (requestId !== phoneVerificationRequest) {
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Unable to verify phone number."
+            );
+        }
+
+        if (data.valid === true) {
+            phoneError.style.color = "green";
+            phoneError.textContent = data.message || "Phone number verified.";
+            phoneError.hidden = false;
+
+            if (pinTrigger) {
+                pinTrigger.disabled = false;
+            }
+        } else {
+            phoneError.style.color = "red";
+            phoneError.textContent = data.message || "Invalid phone number.";
+            phoneError.hidden = false;
+
+            if (pinTrigger) {
+                pinTrigger.disabled = true;
+            }
+        }
+
+    } catch (error) {
+        // Ignore errors from old requests
+        if (requestId !== phoneVerificationRequest) {
+            return;
+        }
+
+        console.error("Phone verification error:", error);
+
+        phoneError.style.color = "red";
+        phoneError.textContent =
+            "Unable to verify phone number. Please try again.";
+        phoneError.hidden = false;
+
+        if (pinTrigger) {
+            pinTrigger.disabled = true;
+        }
+    }
+}
+</script>
+{% endblock %}
+

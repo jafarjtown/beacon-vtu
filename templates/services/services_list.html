@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Buy a service{% endblock %}
+{% block page_title %}Buy a service{% endblock %}
+{% block page_subtitle %}<p>Pick a service.</p>{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/pin_pad.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="service-tabs" id="serviceTabs">
+  <button type="button" class="service-tab active" data-tab="airtime">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+    Airtime
+  </button>
+  <button type="button" class="service-tab" data-tab="data">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20a8 8 0 100-16 8 8 0 000 16z"/><path d="M12 16a4 4 0 100-8 4 4 0 000 8z"/></svg>
+    Data
+  </button>
+  </div>
+
+<form method="post" action="{% url 'services:list' %}" id="buyForm">
+  {% csrf_token %}
+  <input type="hidden" name="service_type" id="serviceTypeInput" value="airtime">
+
+  <div class="buy-grid">
+
+    <!-- ===================== LEFT: FORM PANELS ===================== -->
+    <div>
+<!-- AIRTIME -->
+      <div class="tab-panel active" data-panel="airtime">
+        <div class="buy-card">
+          <h3>Airtime link</h3>
+          <p class="hint">Each slot delivers the same amount to whoever claims it.</p>
+
+          <div class="form-group">
+            <label>Network</label>
+            <div class="provider-row">
+              
+              <label class="provider-chip"><input type="radio" name="network" value="mtn"><span class="sw" style="background:#FFCC08"></span>MTN</label>
+              <label class="provider-chip"><input type="radio" name="network" value="airtel"><span class="sw" style="background:#FFCC08"></span>Airtel</label>
+              <label class="provider-chip"><input type="radio" name="network" value="glo"><span class="sw" style="background:#FFCC08"></span>Glo</label>
+              <label class="provider-chip"><input type="radio" name="network" value="etisalat"><span class="sw" style="background:#FFCC08"></span>Etisalat</label>
+              
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Amount per slot</label>
+            <div class="amount-chip-row">
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="100" data-amount="100">₦100</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="200" data-amount="200">₦200</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="500" data-amount="500" checked>₦500</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="1000" data-amount="1000">₦1,000</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="2000" data-amount="2000">₦2,000</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="custom" data-amount="0">Custom</label>
+            </div>
+            <input type="number" name="amount" id="id_amount_airtime" class="form-input js-amount-field" placeholder="Or enter a custom amount" min="50" value="500">
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA -->
+      <div class="tab-panel" data-panel="data">
+        <div class="buy-card">
+          <h3>Data link</h3>
+          <p class="hint">Each slot delivers the same plan to whoever claims it.</p>
+
+          <div class="form-group">
+            <label>Network</label>
+            <div class="provider-row">
+              {% for provider in providers %}
+              <label class="provider-chip"><input class="data-chip" type="radio" name="network" value="{{ provider.api_id }}"><span class="sw" style="background:#FFCC08"></span>{{ provider }}</label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Data plan</label>
+            <div class="plan-grid">
+              <select name="plan" data-amount="0.00" id="data-plan-select" name="plan" class="form-select">
+                <option value="">Select Plan</option>
+              </select>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    
+    </div>
+
+    <!-- ===================== RIGHT: SUMMARY ===================== -->
+    <div class="summary-card">
+      <h3>Order summary</h3>
+
+      <div class="summary-row"><span>Wallet balance</span><span>₦{{ user.wallet.balance|intcomma }}</span></div>
+      <div class="summary-row"><span>Service</span><span id="sumService">Airtime</span></div>
+      <div class="summary-row"><span>Amount</span><span id="sumAmount">₦500.00</span></div>
+      <div class="summary-row total"><span>Balance after</span><span id="sumAfter">₦11,950.00</span></div>
+      
+      <div class="form-group">
+        <label for="id_phone">Enter Recipient number</label>
+        <input type="tel" name="phone_number" id="id_phone" class="form-input" placeholder="Eg. 08012345678" required>
+        <div hidden style="color: #32f75c;" id="phone-error" class="field-error">Validating number ...</div>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-primary btn-block js-pin-trigger"
+        disabled
+        >Confirm purchase →</button>
+
+      <div class="summary-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Your transaction PIN is required on every purchase to keep your wallet safe.
+      </div>
+    </div>
+
+  </div>
+</form>
+
+{% include "partials/pin-pad.html" %}
+{% endblock %}
+
+{% block body_attrs %}{% if pin_error %} data-pin-error="1" data-pin-error-message="{{ pin_error }}"{% endif %}{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js_/pin_pad.js' %}"></script>
+<script>
+(function(){
+  const tabs = document.querySelectorAll('.service-tab');
+  const panels = document.querySelectorAll('.tab-panel');
+  const serviceTypeInput = document.getElementById('serviceTypeInput');
+  const claimToggleRow = document.getElementById('claimToggleRow');
+  const sumService = document.getElementById('sumService');
+  const sumAmount = document.getElementById('sumAmount');
+  const sumAfter = document.getElementById('sumAfter');
+  const walletBalance = parseFloat("{{ user.wallet.balance }}");
+
+  const serviceLabels = { airtime:'Airtime', data:'Data', electricity:'Electricity', cable:'Cable TV', exam:'Exam pin' };
+  const nonShareable = ['electricity', 'cable'];
+
+  function activateTab(name){
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    panels.forEach(p => p.classList.toggle('active', p.dataset.panel === name));
+    serviceTypeInput.value = name;
+    sumService.textContent = serviceLabels[name] || name;
+    claimToggleRow.style.display = nonShareable.includes(name) ? 'none' : 'flex';
+    updateAmountForActivePanel();
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => activateTab(tab.dataset.tab));
+  });
+
+  // Pre-select tab from ?type= query param
+  const params = new URLSearchParams(window.location.search);
+  const initial = params.get('type');
+  if (initial && serviceLabels[initial]) activateTab(initial);
+
+  function currentAmount(){
+    const active = document.querySelector('.tab-panel.active');
+    if(!active) return 0;
+    // Prefer a checked input with data-amount inside the active panel
+    const checkedAmountInput = active.querySelector('select');
+    if(checkedAmountInput){
+      
+      const val = parseFloat(checkedAmountInput.dataset.amount);
+      if(val > 0) return val;
+    }
+    // Fall back to a manual amount field
+    const manualField = active.querySelector('.js-amount-field');
+    if(manualField && manualField.value) return parseFloat(manualField.value) || 0;
+    // Exam pin: price * quantity
+    const examChecked = active.querySelector('input[name="exam_body"]:checked');
+    if(examChecked){
+      const qty = parseInt(document.getElementById('qtyInput').value || '1', 10);
+      return parseFloat(examChecked.dataset.amount) * qty;
+    }
+    return 0;
+  }
+
+  function updateAmountForActivePanel(){
+    const amt = currentAmount();
+    sumAmount.textContent = '₦' + amt.toLocaleString('en-NG', {minimumFractionDigits:2});
+    const after = walletBalance - amt;
+    sumAfter.textContent = '₦' + after.toLocaleString('en-NG', {minimumFractionDigits:2});
+    sumAfter.style.color = after < 0 ? 'var(--danger)' : '';
+  }
+
+  document.getElementById('buyForm').addEventListener('input', updateAmountForActivePanel);
+  document.getElementById('buyForm').addEventListener('change', updateAmountForActivePanel);
+
+  // Custom amount toggle for airtime
+  document.querySelectorAll('input[name="amount_preset"]').forEach(radio => {
+    radio.addEventListener('change', function(){
+      const field = document.getElementById('id_amount_airtime');
+      if(this.value === 'custom'){
+        field.value = '';
+        field.focus();
+      } else {
+        field.value = this.dataset.amount;
+      }
+      updateAmountForActivePanel();
+    });
+  });
+
+  document.querySelector('#data-plan-select').addEventListener("change", (event) => {
+    // verifyPhone()
+    const selectEl = event.target;
+    const selectedOption = selectEl.options[selectEl.selectedIndex];
+    
+    selectEl.dataset.amount = selectedOption.dataset.amount;
+    updateAmountForActivePanel();
+});
+
+ 
+  
+
+  updateAmountForActivePanel();
+
+
+  document.querySelectorAll('.data-chip').forEach(inp => inp.addEventListener('click', i => {
+    let providerId = i.target.value
+    updateDataPlan(providerId)
+  }));
+  
+  
+  async function updateDataPlan(providerId) {
+    let selectEle = document.getElementById("data-plan-select")
+    selectEle.innerHTML = "<option>Loading plans</option>"
+    let request = await fetch(`{% url 'api-data-plans' %}?serviceID=${providerId}`)
+    let response = await request.json()
+    if(request.ok) {
+      selectEle.innerHTML = "<option>Select plan</option>"
+      response["variations"].forEach(variation => {
+        let option = document.createElement("option")
+        option.value = variation["variation_code"]
+        option.textContent = variation["name"]
+        option.className = "data-option"
+
+        option.setAttribute("data-amount", variation["variation_amount"])
+        
+        selectEle.appendChild(option)
+        })
+      }
+    }
+
+  document.querySelector("#id_phone").addEventListener("input", function (e) { 
+  verifyPhone(e)
+  })
+  
+  let phoneVerificationRequest = 0;
+
+async function verifyPhone(e) {
+    const phoneError = document.querySelector("#phone-error");
+    const pinTrigger = document.querySelector(".js-pin-trigger");
+
+    const active = document.querySelector(".tab-panel.active");
+    const providerChecked = active?.querySelector(
+        'input[name="network"]:checked'
+    );
+
+    // Always disable PIN until verification succeeds
+    if (pinTrigger) {
+        pinTrigger.disabled = true;
+    }
+
+    if (!phoneError) {
+        console.error("Phone error element not found.");
+        return;
+    }
+
+    // Remove spaces and other non-numeric characters
+    const phone = e.target.value.replace(/\D/g, "");
+
+    // Optional: keep the input value clean
+    e.target.value = phone;
+
+    // Validate provider
+    if (!providerChecked) {
+        phoneError.style.color = "red";
+        phoneError.textContent = "Please select a network provider.";
+        phoneError.hidden = false;
+        return;
+    }
+
+    const providerId = providerChecked.value;
+
+    // Validate phone number length
+    if (phone.length < 11) {
+        phoneError.hidden = true;
+        return;
+    }
+
+    // Generate a unique request ID
+    const requestId = ++phoneVerificationRequest;
+
+    phoneError.style.color = "green";
+    phoneError.textContent = "Verifying...";
+    phoneError.hidden = false;
+
+    try {
+        const params = new URLSearchParams({
+            beneficiary: phone,
+            provider_id: providerId
+        });
+
+        const response = await fetch(
+            `{% url 'services:validate' %}?${params.toString()}`,
+            {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json"
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        // Ignore old requests
+        if (requestId !== phoneVerificationRequest) {
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Unable to verify phone number."
+            );
+        }
+
+        if (data.valid === true) {
+            phoneError.style.color = "green";
+            phoneError.textContent = data.message || "Phone number verified.";
+            phoneError.hidden = false;
+
+            if (pinTrigger) {
+                pinTrigger.disabled = false;
+            }
+        } else {
+            phoneError.style.color = "red";
+            phoneError.textContent = data.message || "Invalid phone number.";
+            phoneError.hidden = false;
+
+            if (pinTrigger) {
+                pinTrigger.disabled = true;
+            }
+        }
+
+    } catch (error) {
+        // Ignore errors from old requests
+        if (requestId !== phoneVerificationRequest) {
+            return;
+        }
+
+        console.error("Phone verification error:", error);
+
+        phoneError.style.color = "red";
+        phoneError.textContent =
+            "Unable to verify phone number. Please try again.";
+        phoneError.hidden = false;
+
+        if (pinTrigger) {
+            pinTrigger.disabled = true;
+        }
+    }
+}
+})();
+</script>
+{% endblock %}

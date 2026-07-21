@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create a claim link{% endblock %}
+{% block page_title %}Create a link{% endblock %}
+{% block page_subtitle %}<p>Airtime or Data.</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/pin_pad.css' %}">
+<link rel="stylesheet" href="{% static 'css/links.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="service-tabs" id="serviceTabs">
+  <button type="button" class="service-tab active" data-tab="airtime">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+    Airtime
+  </button>
+  <button type="button" class="service-tab" data-tab="data">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20a8 8 0 100-16 8 8 0 000 16z"/><path d="M12 16a4 4 0 100-8 4 4 0 000 8z"/></svg>
+    Data
+  </button>
+</div>
+
+<form method="post" action="{% url 'links:create' %}" id="linkForm">
+  {% csrf_token %}
+  <input type="hidden" name="service_type" id="serviceTypeInput" value="airtime">
+
+  <div class="buy-grid">
+    <div>
+
+      <!-- AIRTIME -->
+      <div class="tab-panel active" data-panel="airtime">
+        <div class="buy-card">
+          <h3>Airtime link</h3>
+          <p class="hint">Each slot delivers the same amount to whoever claims it.</p>
+
+          <div class="form-group">
+            <label>Network</label>
+            <div class="provider-row">
+              
+              <label class="provider-chip"><input type="radio" name="network" value="mtn"><span class="sw" style="background:#FFCC08"></span>MTN</label>
+              <label class="provider-chip"><input type="radio" name="network" value="airtel"><span class="sw" style="background:#FFCC08"></span>Airtel</label>
+              <label class="provider-chip"><input type="radio" name="network" value="glo"><span class="sw" style="background:#FFCC08"></span>Glo</label>
+              <label class="provider-chip"><input type="radio" name="network" value="etisalat"><span class="sw" style="background:#FFCC08"></span>Etisalat</label>
+              
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Amount per slot</label>
+            <div class="amount-chip-row">
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="100" data-amount="100">₦100</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="200" data-amount="200">₦200</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="500" data-amount="500" checked>₦500</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="1000" data-amount="1000">₦1,000</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="2000" data-amount="2000">₦2,000</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="custom" data-amount="0">Custom</label>
+            </div>
+            <input type="number" name="amount" id="id_amount_airtime" class="form-input js-amount-field" placeholder="Or enter a custom amount" min="50" value="500">
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA -->
+      <div class="tab-panel" data-panel="data">
+        <div class="buy-card">
+          <h3>Data link</h3>
+          <p class="hint">Each slot delivers the same plan to whoever claims it.</p>
+
+          <div class="form-group">
+            <label>Network</label>
+            <div class="provider-row">
+              {% for provider in providers_data %}
+              <label class="provider-chip"><input class="data-chip" type="radio" name="network" value="{{ provider.api_id }}"><span class="sw" style="background:#FFCC08"></span>{{ provider }}</label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Data plan</label>
+            <div class="plan-grid">
+              <select name="plan" data-amount="0.00" id="data-plan-select" name="plan" class="form-select">
+                <option value="">Select Plan</option>
+              </select>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="buy-card" style="margin-top:20px;">
+        <h3>Slots &amp; expiry</h3>
+        <p class="hint">How many people can claim this link, and for how long.</p>
+
+        <div class="form-group">
+          <label>Number of slots</label>
+          <div class="qty-stepper">
+            <button type="button" class="qty-btn" id="qtyMinus">−</button>
+            <span class="qty-val" id="qtyVal">3</span>
+            <button type="button" class="qty-btn" id="qtyPlus">+</button>
+            <input type="hidden" name="slots" id="qtyInput" value="3">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="id_expiry">Expires</label>
+          <select name="expiry" id="id_expiry" class="form-select">
+            <option value="1">In 1 day</option>
+            <option value="3" selected>In 3 days</option>
+            <option value="7">In 7 days</option>
+            <option value="30">In 30 days</option>
+            <option value="0">Never</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="id_note">Note for recipients (optional)</label>
+          <input type="text" name="note" id="id_note" class="form-input" placeholder="e.g. Happy birthday! Here's some data 🎉" maxlength="120">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary-card">
+      <h3>Link summary</h3>
+      <div class="summary-row"><span>Wallet balance</span><span>₦{{ wallet.balance|default:"12,450.00" }}</span></div>
+      <div class="summary-row"><span>Cost per slot</span><span id="sumPerSlot">₦500.00</span></div>
+      <div class="summary-row"><span>Slots</span><span id="sumSlots">3</span></div>
+      <div class="summary-row total"><span>Total cost</span><span id="sumTotal">₦1,500.00</span></div>
+
+      {% if pin_error %}
+        <div class="field-error" style="margin-bottom:14px;">{{ pin_error }}</div>
+      {% endif %}
+
+      <button
+        type="button"
+        class="btn btn-primary btn-block js-pin-trigger"
+        data-pin-length="4"
+        data-pin-prompt="Enter your PIN to generate this claim link."
+      >Generate link →</button>
+
+      <div class="summary-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg>
+        The full slot cost is reserved from your wallet the moment the link is created.
+      </div>
+    </div>
+  </div>
+</form>
+
+{% include 'partials/pin-pad.html' %}
+
+{% endblock %}
+{% block body_attrs %}{% if pin_error %} data-pin-error="1" data-pin-error-message="{{ pin_error }}"{% endif %}{% endblock %}
+{% block extra_scripts %}
+<script src="{% static 'js_/pin_pad.js' %}"></script>
+<script>
+
+(function(){
+  const tabs = document.querySelectorAll('.service-tab');
+  const panels = document.querySelectorAll('.tab-panel');
+  const serviceTypeInput = document.getElementById('serviceTypeInput');
+  const sumPerSlot = document.getElementById('sumPerSlot');
+  const sumSlots = document.getElementById('sumSlots');
+  const sumTotal = document.getElementById('sumTotal');
+  const qtyVal = document.getElementById('qtyVal');
+  const qtyInput = document.getElementById('qtyInput');
+
+  function activateTab(name){
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    panels.forEach(p => p.classList.toggle('active', p.dataset.panel === name));
+    serviceTypeInput.value = name;
+    updateSummary();
+  }
+  tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab.dataset.tab)));
+
+  function perSlotAmount(){
+    const active = document.querySelector('.tab-panel.active');
+    if(!active) return 0;
+    const checked = active.querySelector('select');
+    if(checked){ const v = parseFloat(checked.dataset.amount); if(v > 0) return v; }
+    const manual = active.querySelector('.js-amount-field');
+    if(manual && manual.value) return parseFloat(manual.value) || 0;
+    return 0;
+  }
+
+  function updateSummary(){
+    const per = perSlotAmount();
+    const slots = parseInt(qtyInput.value, 10) || 1;
+    sumPerSlot.textContent = '₦' + per.toLocaleString('en-NG', {minimumFractionDigits:2});
+    sumSlots.textContent = slots;
+    sumTotal.textContent = '₦' + (per * slots).toLocaleString('en-NG', {minimumFractionDigits:2});
+  }
+
+  document.getElementById('linkForm').addEventListener('input', updateSummary);
+  document.getElementById('linkForm').addEventListener('change', updateSummary);
+
+  document.querySelectorAll('input[name="amount_preset"]').forEach(radio => {
+    radio.addEventListener('change', function(){
+      const field = document.getElementById('id_amount_airtime');
+      if(this.value === 'custom'){ field.value = ''; field.focus(); }
+      else { field.value = this.dataset.amount; }
+      updateSummary();
+    });
+  });
+
+  document.querySelector('#data-plan-select').addEventListener("change", (event) => {
+    const selectEl = event.target;
+    const selectedOption = selectEl.options[selectEl.selectedIndex];
+    
+    selectEl.dataset.amount = selectedOption.dataset.amount;
+    updateSummary();
+});
+
+document.getElementById('qtyMinus').addEventListener('click', () => {
+    let v = Math.max(1, parseInt(qtyInput.value, 10) - 1);
+    qtyVal.textContent = v; qtyInput.value = v; updateSummary();
+  });
+  document.getElementById('qtyPlus').addEventListener('click', () => {
+    let v = Math.min(50, parseInt(qtyInput.value, 10) + 1);
+    qtyVal.textContent = v; qtyInput.value = v; updateSummary();
+  });
+  updateSummary();
+
+
+document.querySelectorAll('.data-chip').forEach(inp => inp.addEventListener('click', i => {
+    
+    let providerId = i.target.value
+    updateDataPlan(providerId)
+  }));
+  
+  
+  async function updateDataPlan(providerId) {
+    let selectEle = document.getElementById("data-plan-select")
+    selectEle.innerHTML = "<option>Loading plans</option>"
+    let request = await fetch(`{% url 'api-data-plans' %}?serviceID=${providerId}`)
+    let response = await request.json()
+    if(request.ok) {
+      selectEle.innerHTML = "<option>Select plan</option>"
+      response["variations"].forEach(variation => {
+        let option = document.createElement("option")
+        option.value = variation["variation_code"]
+        option.textContent = variation["name"]
+        option.className = "data-option"
+
+        option.setAttribute("data-amount", variation["variation_amount"])
+        
+        selectEle.appendChild(option)
+        })
+      }
+    }
+
+  
+})();
+</script>
+{% endblock %}

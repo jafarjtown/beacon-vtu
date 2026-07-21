@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Profile{% endblock %}
+{% block page_title %}Profile{% endblock %}
+{% block page_subtitle %}<p>Your account identity.</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="settings-tabs">
+  <a href="{% url 'accounts:profile' %}" class="settings-tab active">Profile</a>
+  <a href="{% url 'accounts:settings' %}" class="settings-tab">Settings</a>
+</div>
+
+<div class="profile-header-card">
+  <div class="avatar-lg">{{ user.get_full_name|slice:":1"|default:"U" }}</div>
+  <div class="profile-header-text">
+    <h2>{{ user.get_full_name|default:"Jafaru Idris" }}</h2>
+    <p>{{ user.email|default:"you@example.com" }}</p>
+    <div class="verify-chip {% if user.is_email_verified %}verified{% else %}unverified{% endif %}">
+      {% if user.is_email_verified %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg> Email verified
+      {% else %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> Email not verified — <a href="#" class="link-accent">resend link</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="settings-card">
+  <h3>Personal information</h3>
+  <p class="hint">Used for support, receipts, and verifying your identity.</p>
+
+  {% if form.non_field_errors %}
+    <div class="alert alert-error">
+      {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" action="{% url 'accounts:profile' %}">
+    {% csrf_token %}
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="id_full_name">Full name</label>
+        <input type="text" name="full_name" id="id_full_name" class="form-input" value="{{ form.get_full_name.value|default:user.get_full_name }}" required>
+        {% for error in form.get_full_name.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="form-group">
+        <label for="id_phone">Phone number</label>
+        <input type="tel" name="phone_number" id="id_phone" class="form-input" placeholder="0803 123 4567" value="{{ form.phone_number.value|default:'' }}">
+        {% for error in form.phone_number.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="id_email">Email address</label>
+      <input type="email" name="email" id="id_email" class="form-input" value="{{ form.email.value|default:user.email }}" required>
+      {% for error in form.email.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+      <div class="field-hint">Changing your email will require re-verification before you can buy anything.</div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save changes</button>
+  </form>
+</div>
+
+<div class="settings-card">
+  <h3>Member since</h3>
+  <p class="hint" style="margin-bottom:0;">{{ user.date_joined|date:"d F Y"|default:"12 July 2026" }} · Account ID <span class="mono">{{ user.id|default:"BCN-00482" }}</span></p>
+</div>
+
+{% endblock %}

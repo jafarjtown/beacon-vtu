@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Link details{% endblock %}
+{% block page_title %}Link details{% endblock %}
+{% block page_subtitle %}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/links.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="breadcrumb">
+  <a href="{% url 'links:my_links' %}">My claim links</a> <span>/</span> <span>{{ link.item_label|default:"₦500 Airtime" }}</span>
+</div>
+
+<div class="detail-header-card">
+  <div class="detail-header-top">
+    <div>
+      <h2>{{ link.item_label|default:"₦500 Airtime" }} · {{ link.provider|default:"MTN" }}</h2>
+      <div class="sub">Created {{ link.created_at|date:"d M Y, g:i A"|default:"12 Jul 2026, 3:40 PM" }}</div>
+    </div>
+    <span class="status-badge status-{{ link.status|default:'active' }}">{{ link.get_status_display|default:link.status|default:"Active" }}</span>
+  </div>
+
+  <div class="qr-and-link">
+    <div class="qr-box" title="QR code"></div>
+    <div class="detail-link-info">
+      <div class="link-url-row" style="margin-bottom:10px;">
+        <span>{{ link.get_absolute_url }}</span>
+        <button type="button" class="copy-btn" id="copyLinkBtn" data-copy="{{ link.get_absolute_url }}">Copy link</button>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:{{ link.percent_claimed }}%;"></div>
+      </div>
+      <div class="progress-label">
+        <span>{{ link.used_slots }} of {{ link.total_slots }} slots claimed</span>
+        <span>{{ link.expires_in|default:"Expires in 2 days" }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="detail-info-grid">
+  <div class="info-tile"><div class="lab">Service</div><div class="val">{{ link.service_type|capfirst }}</div></div>
+  <div class="info-tile"><div class="lab">Value per slot</div><div class="val">₦{{ link.amount }}</div></div>
+  <div class="info-tile"><div class="lab">Total reserved</div><div class="val">₦{{ link.total_reserved }}</div></div>
+  <div class="info-tile"><div class="lab">Total slots</div><div class="val">{{ link.total_slots }}</div></div>
+  <div class="info-tile"><div class="lab">Slots claimed</div><div class="val">{{ link.used_slots }}</div></div>
+  <div class="info-tile"><div class="lab">Expiry date</div><div class="val">{{ link.expiry_date|date:"d M Y"|default:"14 Jul 2026" }}</div></div>
+</div>
+
+{% if link.note %}
+<div class="note-bubble" style="max-width:520px; margin-bottom:24px;">
+  <span class="lab">Note attached to this link</span>
+  "{{ link.note }}"
+</div>
+{% endif %}
+
+<div class="section-title">
+  <h2>Claim history</h2>
+</div>
+
+<div class="claim-log-table">
+  <div class="claim-log-row head">
+    <div></div>
+    <div>Claimed by</div>
+    <div>When</div>
+  </div>
+  {% for slot in link.claimed_slots.all %}
+  <div class="claim-log-row">
+    <div class="claim-log-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <div class="claim-log-desc">
+      <div class="t1">{{ slot.claimed_phone }}</div>
+      <div class="t2">Delivered · {{ claim.reference|default:"BCN-8F3A2GB" }}</div>
+    </div>
+    <div class="tx-amount pos">{{ slot.claimed_at|date:"d M, g:i A"|default:"12 Jul, 4:02 PM" }}</div>
+  </div>
+  {% empty %}
+  <div class="claim-log-row">
+    <div></div>
+    <div class="claim-log-desc"><div class="t1" style="color:var(--text-dimmer);">No one has claimed this link yet.</div></div>
+    <div></div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="danger-zone">
+  <div class="dz-text">
+    <h4>Disable this link</h4>
+    <p>Unclaimed slots stop working immediately. This can't be undone, but reserved funds for unclaimed slots are returned to your wallet.</p>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger" {% if link.status != 'active' %}disabled{% endif %}>Disable link</button>
+  </form>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.getElementById('copyLinkBtn').addEventListener('click', function(){
+    navigator.clipboard.writeText('https://' + this.dataset.copy).then(() => {
+      const original = this.textContent;
+      this.textContent = 'Copied!';
+      setTimeout(() => this.textContent = original, 1500);
+    });
+  });
+</script>
+{% endblock %}

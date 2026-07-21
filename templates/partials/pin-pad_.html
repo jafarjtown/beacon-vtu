@@ -1,0 +1,222 @@
+<div class="pin-modal-overlay" id="pinModalOverlay" aria-hidden="true">
+
+    <div class="pin-modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="pinModalTitle">
+
+        
+        <!-- Scrollable Body -->
+        <div class="pin-modal-body">
+
+            <!-- Icon -->
+            <div class="pin-modal-icon">
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <rect
+                        x="3"
+                        y="11"
+                        width="18"
+                        height="10"
+                        rx="2">
+                    </rect>
+
+                    <path d="M7 11V7a5 5 0 0110 0v4"></path>
+
+                </svg>
+            </div>
+
+            <!-- Title -->
+            <h3 id="pinModalTitle">
+                Enter Transaction PIN
+            </h3>
+
+            <!-- Subtitle -->
+            <p
+                class="pin-modal-sub"
+                id="pinModalSub">
+                Confirm this transaction with your secure PIN.
+            </p>
+
+            <!-- PIN Boxes -->
+            <div
+                class="pin-boxes"
+                id="pinDots"
+                aria-label="PIN Entry">
+
+                <div class="pin-box"></div>
+                <div class="pin-box"></div>
+                <div class="pin-box"></div>
+                <div class="pin-box"></div>
+
+            </div>
+
+            <!-- Error Message -->
+            <div
+                class="pin-error"
+                id="pinError"
+                hidden>
+
+                Incorrect PIN. Please try again.
+
+            </div>
+
+            <!-- Keypad -->
+            <div
+                class="pin-keypad"
+                id="pinKeypad">
+
+                <button
+                    type="button"
+                    class="pin-key"
+                    data-key="1">
+                    1
+                </button>
+
+                <button
+                    type="button"
+                    class="pin-key"
+                    data-key="2">
+                    2
+                </button>
+
+                <button
+                    type="button"
+                    class="pin-key"
+                    data-key="3">
+                    3
+                </button>
+
+                <button
+                    type="button"
+                    class="pin-key"
+                    data-key="4">
+                    4
+                </button>
+
+                <button
+                    type="button"
+                    class="pin-key"
+                    data-key="5">
+                    5
+                </button>
+
+                <button
+                    type="button"
+                    class="pin-key"
+                    data-key="6">
+                    6
+                </button>
+
+                <button
+                    type="button"
+                    class="pin-key"
+                    data-key="7">
+                    7
+                </button>
+
+                <button
+                    type="button"
+                    class="pin-key"
+                    data-key="8">
+                    8
+                </button>
+
+                <button
+                    type="button"
+                    class="pin-key"
+                    data-key="9">
+                    9
+                </button>
+
+                <!-- Empty Space -->
+                <span
+                    class="pin-key pin-key-ghost"
+                    aria-hidden="true">
+                </span>
+
+                <button
+                    type="button"
+                    class="pin-key"
+                    data-key="0">
+                    0
+                </button>
+
+                <button
+                    type="button"
+                    class="pin-key pin-key-backspace"
+                    id="pinBackspace"
+                    aria-label="Delete">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round">
+
+                        <path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2z"></path>
+
+                        <path d="M18 9l-6 6"></path>
+
+                        <path d="M12 9l6 6"></path>
+
+                    </svg>
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="pin-modal-footer">
+
+            <button
+                type="button"
+                class="pin-cancel-btn"
+                id="pinCancel">
+
+                Cancel
+
+            </button>
+
+            <a
+                href="#"
+                class="pin-forgot-link"
+                id="pinForgotLink">
+
+                Forgot PIN?
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Hidden field used by JavaScript -->
+<input
+    type="hidden"
+    id="transactionPin"
+    name="transaction_pin"
+    autocomplete="off">
+
+<!-- Optional loading overlay -->
+<div
+    class="pin-loading-overlay"
+    id="pinLoading"
+    hidden>
+
+    <div class="pin-loading-spinner"></div>
+
+    <p>Verifying PIN...</p>
+
+</div>

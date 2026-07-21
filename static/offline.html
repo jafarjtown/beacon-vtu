@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>You're offline · Beacon</title>
+<style>
+  :root{ --bg:#0B0E1F; --bg-elev:#12162E; --text:#F3F1EA; --text-dim:#9CA1C4; --amber:#FFB020; --mint:#00D9A3; --border:rgba(255,255,255,0.08); }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    background:var(--bg); color:var(--text); font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px;
+    padding-top:max(32px, env(safe-area-inset-top)); padding-bottom:max(32px, env(safe-area-inset-bottom));
+  }
+  .card{ text-align:center; max-width:340px; }
+  .ring-wrap{ position:relative; width:88px; height:88px; margin:0 auto 24px; display:flex; align-items:center; justify-content:center; }
+  .ring-wrap .ring{ position:absolute; border-radius:50%; border:1px solid rgba(255,176,32,0.35); animation:radiate 3.6s cubic-bezier(.2,.6,.3,1) infinite; }
+  .ring-wrap .ring:nth-child(2){ animation-delay:1.2s; }
+  @keyframes radiate{ 0%{ width:40%; height:40%; opacity:.9; border-color:rgba(255,176,32,.6); } 100%{ width:100%; height:100%; opacity:0; border-color:rgba(255,176,32,.05); } }
+  .core{
+    position:relative; z-index:2; width:60px; height:60px; border-radius:16px;
+    background:linear-gradient(150deg, var(--bg-elev), var(--bg)); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .core svg{ width:26px; height:26px; color:var(--amber); }
+  h1{ font-size:19px; margin-bottom:8px; }
+  p{ color:var(--text-dim); font-size:14px; margin-bottom:24px; }
+  button{
+    background:var(--amber); color:#171106; border:none; padding:13px 24px; border-radius:10px;
+    font-size:14.5px; font-weight:600; cursor:pointer; font-family:inherit;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="ring-wrap">
+      <div class="ring"></div><div class="ring"></div>
+      <div class="core">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 11-12.73 0M12 2v10"/></svg>
+      </div>
+    </div>
+    <h1>You're offline</h1>
+    <p>Beacon needs a connection to show your wallet and make purchases. Reconnect and try again.</p>
+    <button onclick="window.location.reload()">Try again</button>
+  </div>
+</body>
+</html>

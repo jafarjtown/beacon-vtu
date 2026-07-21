@@ -1,0 +1,39 @@
+{
+  "name": "Beacon — Airtime, Data & Bills",
+  "short_name": "Beacon",
+  "description": "Fund your wallet once, spend it on airtime, data, electricity, cable and exam pins — or send any of it to someone else with a claim link, no account required to receive it.",
+  "id": "/",
+  "start_url": "/dashboard/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#0B0E1F",
+  "theme_color": "#0B0E1F",
+  "icons": [
+    { "src": "/static/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/static/icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/static/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Buy airtime",
+      "short_name": "Airtime",
+      "url": "/buy/?type=airtime",
+      "icons": [{ "src": "/static/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Buy data",
+      "short_name": "Data",
+      "url": "/buy/?type=data",
+      "icons": [{ "src": "/static/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Create a claim link",
+      "short_name": "Claim link",
+      "url": "/links/create/",
+      "icons": [{ "src": "/static/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Fund wallet{% endblock %}
+{% block page_title %}Fund wallet{% endblock %}
+{% block page_subtitle %}<p>Secure wallet.</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/wallet.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="wallet-grid">
+
+  <div>
+    <div class="service-tabs" id="fundTabs">
+      <button type="button" class="service-tab active" data-tab="transfer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        Bank transfer
+      </button>
+      <button type="button" class="service-tab" data-tab="card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+        Debit card
+      </button>
+    </div>
+
+    <!-- BANK TRANSFER -->
+    <div class="tab-panel active" data-panel="transfer">
+      <div class="buy-card">
+        <h3>Your dedicated account</h3>
+        <p class="hint">Every transfer sent here lands in your Beacon wallet automatically — no reference needed.</p>
+
+        <div class="virtual-account-card">
+          <div class="live-strip">
+            <span class="pulse-dot"></span> Listening for your transfer…
+          </div>
+
+          <div class="va-row">
+            <div class="va-label">Bank name</div>
+            <div class="va-value">{{ virtual_account.bank_name|default:"Wema Bank" }}</div>
+          </div>
+
+          <div class="va-row big">
+            <div>
+              <div class="va-label">Account number</div>
+              <div class="va-value mono-lg">{{ virtual_account.account_number|default:"8021 4477 190" }}</div>
+            </div>
+            <button type="button" class="copy-btn-lg" id="copyAcctBtn" data-copy="{{ virtual_account.account_number|default:'8021447190' }}">Copy</button>
+          </div>
+
+          <div class="va-row">
+            <div class="va-label">Account name</div>
+            <div class="va-value">{{ virtual_account.account_name|default:"Beacon / Jafaru Idris" }}</div>
+          </div>
+        </div>
+
+        <div class="info-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+          Transfers usually reflect within a minute. This account number is permanently yours — save it for next time.
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD -->
+    <div class="tab-panel" data-panel="card">
+      <div class="buy-card">
+        <h3>Pay with debit card</h3>
+        <p class="hint">Instant funding, small processing fee applies.</p>
+
+        <form method="post" action="" id="cardFundForm">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label>Amount</label>
+            <div class="amount-chip-row">
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="1000" data-amount="1000">₦1,000</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="2000" data-amount="2000">₦2,000</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="5000" data-amount="5000" checked>₦5,000</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="10000" data-amount="10000">₦10,000</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="20000" data-amount="20000">₦20,000</label>
+              <label class="amount-chip"><input type="radio" name="amount_preset" value="custom" data-amount="0">Custom</label>
+            </div>
+            <input type="number" name="amount" id="id_amount_card" class="form-input js-amount-field" placeholder="Or enter a custom amount" min="100" value="5000">
+          </div>
+
+          <div class="card-brand-row">
+            <span>We accept</span>
+            <div class="brand-chips">
+              <span class="brand-chip">Visa</span>
+              <span class="brand-chip">Mastercard</span>
+              <span class="brand-chip">Verve</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">Pay ₦<span id="cardAmountLabel">5,000.00</span> →</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT FUNDING -->
+  <div class="summary-card">
+    <h3>Recent funding</h3>
+    {% for tx in recent_fundings %}
+      <div class="fund-log-row">
+        <div class="fund-log-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </div>
+        <div class="fund-log-desc">
+          <div class="t1">₦{{ tx.amount }}</div>
+          <div class="t2">{{ tx.source|default:"Bank transfer" }} · {{ tx.created_at|date:"d M, g:i A" }}</div>
+        </div>
+        <span class="badge badge-{{ tx.status|default:'success' }}">{{ tx.get_status_display|default:tx.status|default:"Success" }}</span>
+      </div>
+    {% empty %}
+      <p style="font-size:13.5px; color:var(--text-dimmer);">No funding yet — your first transfer will show up here.</p>
+    {% endfor %}
+
+    <div class="summary-note" style="margin-top:18px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      All funding is credited to your wallet before it can be spent. Nothing leaves your bank account until you send the transfer.
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+  const tabs = document.querySelectorAll('#fundTabs .service-tab');
+  const panels = document.querySelectorAll('.tab-panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.toggle('active', t === tab));
+      panels.forEach(p => p.classList.toggle('active', p.dataset.panel === tab.dataset.tab));
+    });
+  });
+
+  document.getElementById('copyAcctBtn').addEventListener('click', function(){
+    navigator.clipboard.writeText(this.dataset.copy).then(() => {
+      const original = this.textContent;
+      this.textContent = 'Copied!';
+      setTimeout(() => this.textContent = original, 1500);
+    });
+  });
+
+  const cardAmountLabel = document.getElementById('cardAmountLabel');
+  function updateCardLabel(){
+    const field = document.getElementById('id_amount_card');
+    const val = parseFloat(field.value) || 0;
+    cardAmountLabel.textContent = val.toLocaleString('en-NG', {minimumFractionDigits:2});
+  }
+  document.querySelectorAll('input[name="amount_preset"]').forEach(radio => {
+    radio.addEventListener('change', function(){
+      const field = document.getElementById('id_amount_card');
+      if(this.value === 'custom'){ field.value = ''; field.focus(); }
+      else { field.value = this.dataset.amount; }
+      updateCardLabel();
+    });
+  });
+  document.getElementById('id_amount_card').addEventListener('input', updateCardLabel);
+  updateCardLabel();
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,173 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Dashboard{% endblock %} · Beacon</title>
+
+<link rel="manifest" href="{% static 'manifest.json' %}">
+<meta name="theme-color" content="#0B0E1F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Beacon">
+<link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}">
+<link rel="icon" href="{% static 'icons/icon-512.png' %}">
+
+  
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/native.css' %}">
+{% block extra_head %}{% endblock %}
+</head>
+<body{% block body_attrs %}{% endblock %}>
+{% include "partials/splash.html" %}
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top-row">
+      <a href="{% url 'dashboard:index' %}" class="logo">
+        <span class="bars"><span></span><span></span><span></span><span></span></span>
+        Beacon
+      </a>
+      <button class="sidebar-close" id="sidebarCloseBtn" aria-label="Close menu">✕</button>
+    </div>
+
+    <nav class="side-nav">
+      <div class="nav-label">Menu</div>
+      <a href="{% url 'dashboard:index' %}" class="nav-link {% if active_nav == 'dashboard' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a href="{% url 'services:list' %}" class="nav-link {% if active_nav == 'buy' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>
+        Buy a service
+      </a>
+      <a href="{% url 'links:my_links' %}" class="nav-link {% if active_nav == 'claims' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg>
+        Claim links
+      </a>
+      <a href="{% url 'transactions:history' %}" class="nav-link {% if active_nav == 'transactions' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg>
+        Transactions
+      </a>
+      <a href="{% url 'wallet:fund' %}" class="nav-link {% if active_nav == 'wallet' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        Fund wallet
+      </a>
+
+      <div class="nav-label">Account</div>
+      <a href="{% url 'accounts:settings' %}" class="nav-link {% if active_nav == 'settings' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
+      <form method="post" action="{% url 'accounts:logout' %}" class="logout-form">
+        {% csrf_token %}
+        <button type="submit" class="nav-link nav-link-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+          Log out
+        </button>
+      </form>
+    </nav>
+
+    <div class="sidebar-wallet">
+      <div class="label">Wallet balance</div>
+      <div class="amount">₦{{ user.wallet.balance|intcomma }}</div>
+      <a href="{% url 'wallet:fund' %}" class="btn btn-primary btn-sm">Fund wallet</a>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Main -->
+  <div class="app-main">
+    <header class="app-topbar">
+      <button class="burger" id="burgerBtn" aria-label="Toggle menu">☰</button>
+      <div class="topbar-title">
+        <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+        {% block page_subtitle %}{% endblock %}
+      </div>
+      <div class="topbar-actions">
+        <div class="wallet-chip">
+          <span class="dot"></span> ₦{{ user.wallet.balance|intcomma }}
+        </div>
+        <a href="{% url 'notifications:list' %}" class="icon-btn" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+        </a>
+        <div class="user-chip">
+          <a href="{% url 'accounts:profile' %}">
+            <div class="avatar">{{ user.get_full_name|slice:":1"|default:"U" }}</div>
+            <span class="uname">{{ user.get_full_name|default:"Account" }}</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    {% if messages %}
+      <div class="messages-wrap">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'success' }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <main class="app-content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<script>
+  const burger = document.getElementById('burgerBtn');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const closeBtn = document.getElementById('sidebarCloseBtn');
+
+  function openSidebar(){
+    sidebar.classList.add('open');
+    overlay.classList.add('open');
+    document.body.classList.add('sidebar-locked');
+  }
+  function closeSidebar(){
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+    document.body.classList.remove('sidebar-locked');
+  }
+
+  if (burger) {
+    burger.addEventListener('click', () => {
+      sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+    });
+  }
+  if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+  if (overlay) overlay.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSidebar();
+  });
+  // Close automatically if a nav link is tapped (mobile)
+  sidebar.querySelectorAll('a, button[type="submit"]').forEach(el => {
+    el.addEventListener('click', () => { if (window.innerWidth <= 920) closeSidebar(); });
+  });
+</script>
+
+<div class="install-banner" id="installBanner" hidden>
+  <div class="install-banner-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+  </div>
+  <div class="install-banner-text" id="installBannerText">Install Beacon for quicker, full-screen access.</div>
+  <div class="install-banner-actions">
+    <button type="button" class="install-banner-btn" id="installBannerBtn">Install</button>
+    <button type="button" class="install-banner-close" id="installBannerDismiss" aria-label="Dismiss">✕</button>
+  </div>
+</div>
+
+<script src="{% static 'js_/pwa-register.js' %}"></script>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,108 @@
+:root{
+  --bg:#0B0E1F; --bg-elev:#12162E; --bg-elev-2:#171C38;
+  --text:#F3F1EA; --text-dim:#9CA1C4; --text-dimmer:#6B7098;
+  --amber:#FFB020; --mint:#00D9A3; --danger:#FF6B6B;
+  --border:rgba(255,255,255,0.08); --border-strong:rgba(255,255,255,0.14);
+}
+
+.pin-modal-overlay{
+  position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px);
+  display:flex; align-items:flex-end; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .2s;
+}
+.pin-modal-overlay.open{ opacity:1; pointer-events:auto; }
+body.pin-modal-locked{ overflow:hidden; }
+
+.pin-modal{
+  width:100%; max-width:380px; max-height:90vh; background:var(--bg-elev); border:1px solid var(--border-strong);
+  border-radius:22px 22px 0 0; position:relative; display:flex; flex-direction:column; overflow:hidden;
+  transform:translateY(100%); transition:transform .28s cubic-bezier(.2,.8,.3,1);
+}
+.pin-modal-overlay.open .pin-modal{ transform:translateY(0); }
+
+/* On wider screens, present as a centered card instead of a bottom sheet */
+@media(min-width:640px){
+  .pin-modal-overlay{ align-items:center; }
+  .pin-modal{ border-radius:20px; transform:translateY(16px) scale(.97); }
+  .pin-modal-overlay.open .pin-modal{ transform:translateY(0) scale(1); }
+}
+
+.pin-modal-body{
+  flex:1; min-height:0; overflow-y:auto; text-align:center; padding:22px 22px 6px;
+}
+
+.pin-modal-icon{
+  width:40px; height:40px; border-radius:12px; background:rgba(255,176,32,0.1); color:var(--amber);
+  display:flex; align-items:center; justify-content:center; margin:0 auto 12px;
+}
+.pin-modal-icon svg{ width:20px; height:20px; }
+
+.pin-modal h3{ font-family:'Space Grotesk',sans-serif; font-size:16.5px; margin-bottom:4px; }
+.pin-modal-sub{ font-size:12.5px; color:var(--text-dim); margin-bottom:16px; padding:0 8px; }
+
+/* Square PIN entry indicators instead of dots */
+.pin-boxes{ display:flex; justify-content:center; gap:10px; margin-bottom:6px; min-height:38px; }
+.pin-box{
+  width:38px; height:38px; border-radius:9px; border:1.5px solid var(--border-strong);
+  background:var(--bg-elev-2); display:flex; align-items:center; justify-content:center;
+  transition:background .15s, border-color .15s, transform .15s;
+}
+.pin-box.filled{
+  background:rgba(255,176,32,0.12); border-color:var(--amber); transform:scale(1.04);
+}
+.pin-box.filled::after{
+  content:''; width:8px; height:8px; border-radius:2px; background:var(--amber);
+}
+
+.pin-boxes.shake{ animation:pinShake .4s; }
+@keyframes pinShake{
+  10%,90%{ transform:translateX(-1px); }
+  20%,80%{ transform:translateX(2px); }
+  30%,50%,70%{ transform:translateX(-4px); }
+  40%,60%{ transform:translateX(4px); }
+}
+
+.pin-error{ color:var(--danger); font-size:12px; margin-bottom:10px; min-height:15px; }
+
+.pin-keypad{
+  display:grid; grid-template-columns:repeat(3, .5fr); gap:10px; max-width:240px; margin:10px auto 8px;
+}
+.pin-key{
+  aspect-ratio:1; border-radius:10%; border:1px solid var(--border); background:var(--bg-elev-2);
+  color:var(--text); font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;
+  display:flex; align-items:center; justify-content:center; user-select:none;
+  transition:background .12s, transform .08s;
+}
+.pin-key:active{ background:rgba(255,176,32,0.16); transform:scale(0.93); }
+.pin-key-ghost{ border:none; background:none; pointer-events:none; }
+.pin-key-backspace{ color:var(--text-dim); }
+.pin-key-backspace svg{ width:17px; height:17px; }
+
+.pin-modal-footer{
+  flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 22px; border-top:1px solid var(--border);
+}
+.pin-forgot-link{ font-size:12.5px; color:var(--amber); font-weight:500; }
+.pin-forgot-link:hover{ text-decoration:underline; }
+.pin-cancel-btn{
+  padding:8px 16px; border-radius:999px; font-size:12.5px; font-weight:600;
+  border:1px solid var(--border-strong); background:none; color:var(--text-dim);
+}
+.pin-cancel-btn:hover{ color:var(--text); border-color:var(--text-dim); }
+
+/* Trigger buttons that open this modal don't need special styling beyond
+   what .btn already provides in app.css / auth.css. */
+.pin-processing-panel{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:40px 20px 34px; text-align:center; min-height:280px;
+}
+.pin-spinner{
+  width:38px; height:38px; border-radius:50%;
+  border:3px solid var(--border-strong); border-top-color:var(--amber);
+  animation:pinSpin .7s linear infinite; margin-bottom:16px;
+}
+@keyframes pinSpin{ to{ transform:rotate(360deg); } }
+.pin-processing-text{ font-size:13.5px; color:var(--text-dim); }
+@media (prefers-reduced-motion: reduce){
+  .pin-spinner{ animation-duration:1.6s; }
+}

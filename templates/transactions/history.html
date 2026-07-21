@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block title %}Transactions{% endblock %}
+{% block page_title %}Transactions{% endblock %}
+{% block page_subtitle %}<p>All transactions.</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/transactions.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="tx-toolbar">
+  <form method="get" class="tx-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input type="text" name="q" placeholder="Search by reference or description" value="{{ request.GET.q }}">
+  </form>
+  <div class="tx-toolbar-actions">
+    <select name="date_range" class="form-select tx-select">
+      <option value="7">Last 7 days</option>
+      <option value="30" selected>Last 30 days</option>
+      <option value="90">Last 90 days</option>
+      <option value="all">All time</option>
+    </select>
+    <button type="button" class="btn btn-ghost" id="exportBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;"><path d="M12 15V3M6 9l6 6 6-6"/><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/></svg>
+      Export
+    </button>
+  </div>
+</div>
+
+<div class="tx-summary-strip">
+  <div class="tsi"><span class="lab">Total in</span><span class="val pos">+₦{{ user.total_money_in|intcomma }}</span></div>
+  <div class="tsi"><span class="lab">Total out</span><span class="val">−₦{{ user.total_money_out|intcomma }}</span></div>
+  <div class="tsi"><span class="lab">Transactions</span><span class="val">{{ user.transactions.count }}</span></div>
+</div>
+
+<div class="tx-table full">
+  <div class="tx-row head">
+    <div></div>
+    <div>Description</div>
+    <div class="col-status">Status</div>
+    
+    <div>Amount</div>
+  </div>
+
+  {% for tx in transactions %}
+    {% include 'partials/transaction.html' with tx=tx %}
+  {% empty %}
+  <div class="tx-row">
+    <div></div>
+    <div class="tx-desc"><div class="t1" style="color:var(--text-dimmer);">No transactions match this filter.</div></div>
+    <div class="col-status"></div>
+    <div></div>
+    <div></div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if transactions.has_other_pages %}
+<div class="tx-pagination">
+  {% if transactions.has_previous %}
+    <a href="?page={{ transactions.previous_page_number }}" class="btn btn-ghost btn-sm-inline">← Previous</a>
+  {% endif %}
+  <span class="page-info">Page {{ transactions.number }} of {{ transactions.paginator.num_pages }}</span>
+  {% if transactions.has_next %}
+    <a href="?page={{ transactions.next_page_number }}" class="btn btn-ghost btn-sm-inline">Next →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.getElementById('exportBtn').addEventListener('click', function(){
+    window.location.href = '?' + new URLSearchParams(window.location.search) + '&export=csv';
+  });
+</script>
+{% endblock %}

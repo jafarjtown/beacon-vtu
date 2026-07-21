@@ -1,0 +1,215 @@
+{% extends "base_auth.html" %}
+{% load static %}
+
+{% block title %}Create your account · Beacon{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+
+  <!-- Brand panel -->
+  <div class="auth-brand">
+    <div class="beacon-visual">
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+      <div class="beacon-core">
+        <div class="bars"><span></span><span></span><span></span><span></span></div>
+      </div>
+    </div>
+    <h2>One wallet for every network you actually use.</h2>
+    <p>Fund once, then spend on airtime, data, electricity, cable and exam pins &mdash; all from the same balance.</p>
+    <div class="brand-points">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg> Free to create, no card required</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg> Instant delivery on every purchase</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg> Bank-level encryption on your wallet</span>
+    </div>
+  </div>
+
+  <!-- Form panel -->
+  <div class="auth-form-panel">
+    <div class="auth-card">
+      <div class="eyebrow">Step 1 of 1</div>
+      <h1>Create your account</h1>
+      <p class="sub">Takes less than a minute. No card required.</p>
+      {% if messages %}
+      <div class="messages-wrap">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'success' }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-error non-field-errors">
+          <ul>
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'accounts:register' %}" novalidate>
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="{{ form.first_name.id_for_name|default:'id_first_name' }}">Full name</label>
+          <div class="input-wrap">
+            <input
+              type="text"
+              name="first_name"
+              id="id_first_name"
+              class="form-input {% if form.first_name.errors %}has-error{% endif %}"
+              placeholder="Jafaru"
+              value="{{ form.first_name.value|default:'' }}"
+              autocomplete="name"
+              required
+              autofocus
+            >
+          </div>
+          {% for error in form.first_name.errors %}
+            <div class="field-error">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.last_name.id_for_name|default:'id_last_name' }}">Full name</label>
+          <div class="input-wrap">
+            <input
+              type="text"
+              name="last_name"
+              id="id_last_name"
+              class="form-input {% if form.last_name.errors %}has-error{% endif %}"
+              placeholder="Idris"
+              value="{{ form.last_name.value|default:'' }}"
+              autocomplete="name"
+              required
+              autofocus
+            >
+          </div>
+          {% for error in form.last_name.errors %}
+            <div class="field-error">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          <label for="id_email">Email address</label>
+          <div class="input-wrap">
+            <input
+              type="email"
+              name="email"
+              id="id_email"
+              class="form-input {% if form.email.errors %}has-error{% endif %}"
+              placeholder="you@example.com"
+              value="{{ form.email.value|default:'' }}"
+              autocomplete="email"
+              required
+            >
+          </div>
+          {% for error in form.email.errors %}
+            <div class="field-error">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          <label for="id_phone_number">Phone Number</label>
+          <div class="input-wrap">
+            <input
+              type="tel"
+              name="phone_number"
+              id="id_phone_number"
+              class="form-input {% if form.phone_number.errors %}has-error{% endif %}"
+              placeholder="07080332077"
+              value="{{ form.phone_number.value|default:'' }}"
+              autocomplete="phone_number"
+              required
+            >
+          </div>
+          {% for error in form.phone_number.errors %}
+            <div class="field-error">{{ error }}</div>
+          {% endfor %}
+        </div>
+        
+        <div class="form-group">
+          <label for="id_password1">Password</label>
+          <div class="input-wrap">
+            <input
+              type="password"
+              name="password1"
+              id="id_password1"
+              class="form-input {% if form.password1.errors %}has-error{% endif %}"
+              placeholder="Create a password"
+              autocomplete="new-password"
+              required
+            >
+            <button type="button" class="toggle-pw" data-target="id_password1">Show</button>
+          </div>
+          {% for error in form.password1.errors %}
+            <div class="field-error">{{ error }}</div>
+          {% endfor %}
+          <div class="field-hint">At least 8 characters. Avoid common passwords.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="id_">Confirm password</label>
+          <div class="input-wrap">
+            <input
+              type="password"
+              name="password2"
+              id="id_password2"
+              class="form-input {% if form.password2.errors %}has-error{% endif %}"
+              placeholder="Re-enter your password"
+              autocomplete="new-password"
+              required
+            >
+            <button type="button" class="toggle-pw" data-target="id_password2">Show</button>
+          </div>
+          {% for error in form.password2.errors %}
+            <div class="field-error">{{ error }}</div>
+          {% endfor %}
+        </div>
+        
+        <div class="form-group">
+          <label for="id_referral_code">Referral Code (optional)</label>
+          <div class="input-wrap">
+            <input
+              type="text"
+              name="referral_code"
+              id="id_referral_code"
+              class="form-input {% if form.referral_code.errors %}has-error{% endif %}"
+              placeholder="Optional"
+              autocomplete="referral_code"
+              
+            >
+          </div>
+          {% for error in form.referral_code.errors %}
+            <div class="field-error">{{ error }}</div>
+          {% endfor %}
+        </div>
+        
+        
+
+        <div class="form-row-between">
+          <label class="checkbox-row">
+            <input type="checkbox" name="agree_terms" required>
+            I agree to the <a href="#" class="link-accent">Terms</a> and <a href="#" class="link-accent">Privacy Policy</a>
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create account →</button>
+      </form>
+
+      <p class="switch-line">Already have an account? <a href="{% url 'accounts:login' %}" class="link-accent">Log in</a></p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.toggle-pw').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var input = document.getElementById(btn.dataset.target);
+      var showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      btn.textContent = showing ? 'Show' : 'Hide';
+    });
+  });
+</script>
+{% endblock %}

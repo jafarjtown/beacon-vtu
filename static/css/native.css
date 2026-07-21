@@ -1,0 +1,89 @@
+/**
+ * Native-app-feel rules, shared across base.html / base_auth.html /
+ * base_public.html. On its own this doesn't make a web app "native" —
+ * that's mostly the manifest + service worker — but these are the small
+ * physical details that make a standalone-mode PWA stop feeling like a
+ * browser tab: no rubber-band overscroll past the top/bottom of the
+ * page, no gray flash on tap, no accidental text selection when someone
+ * taps-and-holds a button, and content that doesn't sit under the
+ * notch/home-indicator on iPhone.
+ */
+
+html, body {
+  /* Stops the whole page rubber-banding / triggering pull-to-refresh —
+     native apps don't do this; a standalone PWA shouldn't either. */
+  overscroll-behavior-y: contain;
+}
+
+* {
+  /* Removes the gray tap-highlight flash on iOS/Android Chrome. Focus
+     rings (:focus-visible) still work fine and remain the real a11y cue. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, a, .nav-link, .service-tab, .filter-tab, .pin-key,
+.provider-chip, .amount-chip, .plan-card, .qa-item, .qty-btn {
+  /* Tap-and-hold on interactive chrome shouldn't pop a text-selection
+     handle or a "copy" callout — that's a browser behavior, not an app one. */
+  -webkit-touch-callout: none;
+  user-select: none;
+  /* Skips the ~300ms double-tap-to-zoom delay some mobile browsers add
+     before registering a tap, so buttons feel immediately responsive. */
+  touch-action: manipulation;
+}
+
+/* Safe-area padding for the iPhone notch / Dynamic Island and the home
+   indicator. Only takes effect when the <meta viewport-fit=cover> tag is
+   present (added alongside this stylesheet in every base template) —
+   without it, env(safe-area-inset-*) always resolves to 0 and this is a
+   no-op on non-notched devices, which is the desired fallback. */
+.app-topbar {
+  padding-top: max(20px, env(safe-area-inset-top));
+}
+.sidebar {
+  padding-top: max(22px, env(safe-area-inset-top));
+  padding-bottom: max(22px, env(safe-area-inset-bottom));
+}
+.auth-topbar {
+  padding-top: max(22px, env(safe-area-inset-top));
+}
+.pin-modal-footer {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+/* The install banner (see #installBanner in base.html) */
+.install-banner {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 400;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.6);
+  max-width: 420px;
+  margin: 0 auto;
+}
+.install-banner[hidden] { display: none; }
+.install-banner-icon {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  background: rgba(255, 176, 32, 0.12); color: var(--amber);
+  display: flex; align-items: center; justify-content: center;
+}
+.install-banner-icon svg { width: 18px; height: 18px; }
+.install-banner-text { flex: 1; font-size: 13px; color: var(--text-dim); min-width: 0; }
+.install-banner-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.install-banner-btn {
+  background: var(--amber); color: #171106; border: none; padding: 8px 14px;
+  border-radius: 8px; font-size: 12.5px; font-weight: 600;
+}
+.install-banner-close {
+  background: none; border: none; color: var(--text-dimmer); width: 28px; height: 28px;
+  border-radius: 50%; font-size: 14px;
+}
+.install-banner-close:hover { color: var(--text-dim); }

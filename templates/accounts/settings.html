@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Settings{% endblock %}
+{% block page_title %}Settings{% endblock %}
+{% block page_subtitle %}<p>Account controls.</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="settings-tabs">
+  <a href="{% url 'accounts:profile' %}" class="settings-tab">Profile</a>
+  <a href="{% url 'accounts:settings' %}" class="settings-tab active">Settings</a>
+</div>
+
+<!-- Change password -->
+<div class="settings-card">
+  <h3>Change password</h3>
+  <p class="hint">You'll need this to confirm every purchase, so make it something you'll remember.</p>
+
+  {% if password_form.non_field_errors %}
+    <div class="alert alert-error">
+      {% for error in password_form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" action="">
+    {% csrf_token %}
+    <input type="hidden" name="form_id" value="password">
+
+    <div class="form-group">
+      <label for="id_current_password">Current password</label>
+      <input type="password" name="current_password" id="id_current_password" class="form-input" placeholder="Enter your current password" required>
+      {% for error in password_form.current_password.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="id_new_password1">New password</label>
+        <input type="password" name="new_password1" id="id_new_password1" class="form-input" placeholder="Create a new password" required>
+        {% for error in password_form.new_password1.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="form-group">
+        <label for="id_new_password2">Confirm new password</label>
+        <input type="password" name="new_password2" id="id_new_password2" class="form-input" placeholder="Re-enter new password" required>
+        {% for error in password_form.new_password2.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update password</button>
+  </form>
+</div>
+
+<!-- Notifications -->
+<div class="settings-card">
+  <h3>Notifications</h3>
+  <p class="hint">Choose what you want to hear about.</p>
+
+  <form method="post" action="">
+    {% csrf_token %}
+    <input type="hidden" name="form_id" value="notifications">
+
+    <div class="toggle-row">
+      <div class="tr-text">Purchase confirmations<small>Get notified the moment a purchase is delivered</small></div>
+      <label class="switch"><input type="checkbox" name="notify_purchases" checked><span class="slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div class="tr-text">Claim link activity<small>When someone claims a link you've sent</small></div>
+      <label class="switch"><input type="checkbox" name="notify_claims" checked><span class="slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div class="tr-text">Wallet funding<small>When a bank transfer lands in your wallet</small></div>
+      <label class="switch"><input type="checkbox" name="notify_funding" checked><span class="slider"></span></label>
+    </div>
+    <div class="toggle-row" style="margin-bottom:0;">
+      <div class="tr-text">Product updates<small>Occasional emails about new features</small></div>
+      <label class="switch"><input type="checkbox" name="notify_marketing"><span class="slider"></span></label>
+    </div>
+
+    <button type="submit" class="btn btn-ghost" style="margin-top:20px;">Save preferences</button>
+  </form>
+</div>
+
+<!-- Security -->
+<div class="settings-card">
+  <h3>Security</h3>
+  <p class="hint">Extra protection for your wallet.</p>
+
+  <div class="toggle-row" style="margin-bottom:0;">
+    <div class="tr-text">Password confirmation on every purchase<small>Recommended — keeps your wallet safe even if your session is open</small></div>
+    <label class="switch"><input type="checkbox" checked disabled><span class="slider"></span></label>
+  </div>
+</div>
+
+<!-- Transaction PIN -->
+<div class="settings-card">
+  <h3>Transaction PIN</h3>
+  <p class="hint">
+    {% if request.user.transaction_pin_hash %}
+      Update your 4-digit transaction PIN. You'll need it to authorize wallet transactions.
+    {% else %}
+      Create a 4-digit transaction PIN to secure wallet transactions.
+    {% endif %}
+  </p>
+
+  {% if pin_form.non_field_errors %}
+    <div class="alert alert-error">
+      {% for error in pin_form.non_field_errors %}
+        <div>{{ error }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" action="">
+    {% csrf_token %}
+    <input type="hidden" name="form_id" value="transaction_pin">
+
+    {% if request.user.transaction_pin_hash %}
+    <div class="form-group">
+      <label for="id_current_pin">Current PIN</label>
+      <input
+        type="password"
+        name="current_pin"
+        id="id_current_pin"
+        class="form-input"
+        placeholder="Enter current PIN"
+        maxlength="4"
+        inputmode="numeric"
+        pattern="[0-9]{4}"
+        required>
+      {% for error in pin_form.current_pin.errors %}
+        <div class="field-error">{{ error }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="id_new_pin1">
+          {% if request.user.transaction_pin_hash %}
+            New PIN
+          {% else %}
+            Transaction PIN
+          {% endif %}
+        </label>
+        <input
+          type="password"
+          name="new_pin1"
+          id="id_new_pin1"
+          class="form-input"
+          placeholder="Enter 4-digit PIN"
+          maxlength="4"
+          inputmode="numeric"
+          pattern="[0-9]{4}"
+          required>
+        {% for error in pin_form.new_pin1.errors %}
+          <div class="field-error">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        <label for="id_new_pin2">Confirm PIN</label>
+        <input
+          type="password"
+          name="new_pin2"
+          id="id_new_pin2"
+          class="form-input"
+          placeholder="Confirm PIN"
+          maxlength="4"
+          inputmode="numeric"
+          pattern="[0-9]{4}"
+          required>
+        {% for error in pin_form.new_pin2.errors %}
+          <div class="field-error">{{ error }}</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+      {% if request.user.transaction_pin_hash %}
+        Update PIN
+      {% else %}
+        Create PIN
+      {% endif %}
+    </button>
+  </form>
+</div>
+
+<!-- Danger zone -->
+<div class="settings-card danger">
+  <h3>Danger zone</h3>
+  <p class="hint">These actions are permanent.</p>
+
+  <div class="danger-row">
+    <div class="dz-text">
+      <h4>Deactivate account</h4>
+      <p>Temporarily disable your account. You can log back in anytime to reactivate it.</p>
+    </div>
+    <button type="button" class="btn btn-ghost" id="deactivateBtn">Deactivate</button>
+  </div>
+
+  <div class="danger-row">
+    <div class="dz-text">
+      <h4>Delete account</h4>
+      <p>Permanently delete your account and wallet history. This can't be undone.</p>
+    </div>
+    <button type="button" class="btn btn-danger" id="deleteBtn">Delete account</button>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.getElementById('deleteBtn').addEventListener('click', function(){
+    if(confirm('This will permanently delete your account and wallet history. This cannot be undone. Continue?')){
+      window.location.href = "";
+    }
+  });
+  document.getElementById('deactivateBtn').addEventListener('click', function(){
+    if(confirm('Deactivate your account? You can log back in anytime to reactivate it.')){
+      window.location.href = "";
+    }
+  });
+</script>
+{% endblock %}

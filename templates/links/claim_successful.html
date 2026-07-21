@@ -1,0 +1,36 @@
+{% extends "base_public.html" %}
+{% load static %}
+
+{% block title %}Claim successful · Beacon{% endblock %}
+
+{% block content %}
+<div class="claim-shell state-card">
+
+  <div class="state-icon-ring success">
+    <div class="ring"></div><div class="ring"></div>
+    <div class="state-icon-core success">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+  </div>
+
+  <h1>You've received {{ slot.link.item_label }}</h1>
+  <p class="desc">It's already on its way to {{ slot.claimed_by }}. Delivery usually lands within seconds.</p>
+
+  <div class="receipt-box">
+    <div class="receipt-row"><span>Delivered to</span><span>{{ slot.claimed_by }}</span></div>
+    <div class="receipt-row"><span>Network</span><span>{{ slot.link.network.name }}</span></div>
+    <div class="receipt-row"><span>Item</span><span>{{ slot.link.item_label }}</span></div>
+    <div class="receipt-row"><span>Reference</span><span>{{ slot.reference|default:"BCN-8F3A2GB" }}</span></div>
+    <div class="receipt-row"><span>Time</span><span>{{ slot.claimed_at|date:"d M, g:i A"|default:"Just now" }}</span></div>
+  </div>
+
+  <div class="state-actions">
+    <a href="{% url 'accounts:register' %}" class="btn btn-primary">Create your own free account →</a>
+  </div>
+
+  <p style="font-size:12.5px; color:var(--text-dimmer); margin-top:20px;">
+    Want to send airtime or data this easily too? Beacon accounts are free, and take under a minute.
+  </p>
+
+</div>
+{% endblock %}

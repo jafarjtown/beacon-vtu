@@ -1,0 +1,42 @@
+{% extends "base_public.html" %}
+{% load static %}
+
+{% block title %}This link isn't available · Beacon{% endblock %}
+
+{% block content %}
+<div class="claim-shell state-card">
+
+  <div class="state-icon-ring failed">
+    <div class="ring"></div><div class="ring"></div>
+    <div class="state-icon-core failed">
+      {% if reason == 'expired' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      {% elif reason == 'exhausted' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg>
+      {% else %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if reason == 'expired' %}
+    <h1>This link has expired</h1>
+    <p class="desc">The sender set this link to expire, and that time has passed. Ask them to send a new one.</p>
+  {% elif reason == 'exhausted' %}
+    <h1>All slots have been claimed</h1>
+    <p class="desc">This link only had a limited number of claims, and they've all been used. Ask the sender for a new link if there's more coming.</p>
+  {% elif reason == 'disabled' %}
+    <h1>This link was disabled</h1>
+    <p class="desc">The sender turned this link off. Reach out to them directly if you were expecting something.</p>
+  {% else %}
+    <h1>This link isn't valid</h1>
+    <p class="desc">We couldn't find an active claim link at this address. Double-check the link, or ask the sender to resend it.</p>
+  {% endif %}
+
+  <div class="state-actions">
+    <a href="" class="btn btn-ghost">Go to Beacon home</a>
+    <a href="{% url 'accounts:register' %}" class="btn btn-primary">Create a free account →</a>
+  </div>
+
+</div>
+{% endblock %}

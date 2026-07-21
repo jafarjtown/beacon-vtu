@@ -1,0 +1,51 @@
+
+<div class="pin-modal-overlay" id="pinModalOverlay">
+  <div class="pin-modal" role="dialog" aria-modal="true" aria-labelledby="pinModalTitle">
+
+    <div class="pin-modal-body">
+
+      <div class="pin-entry-panel" id="pinEntryPanel">
+        <div class="pin-modal-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+
+        <h3 id="pinModalTitle">Enter your PIN</h3>
+        <p class="pin-modal-sub" id="pinModalSub">Confirm this with your transaction PIN.</p>
+
+        <div class="pin-boxes" id="pinDots"></div>
+
+        <div class="pin-error" id="pinError" hidden>Incorrect PIN. Try again.</div>
+
+        <div class="pin-keypad">
+          <button type="button" class="pin-key" data-key="1">1</button>
+          <button type="button" class="pin-key" data-key="2">2</button>
+          <button type="button" class="pin-key" data-key="3">3</button>
+          <button type="button" class="pin-key" data-key="4">4</button>
+          <button type="button" class="pin-key" data-key="5">5</button>
+          <button type="button" class="pin-key" data-key="6">6</button>
+          <button type="button" class="pin-key" data-key="7">7</button>
+          <button type="button" class="pin-key" data-key="8">8</button>
+          <button type="button" class="pin-key" data-key="9">9</button>
+          <span class="pin-key pin-key-ghost" aria-hidden="true"></span>
+          <button type="button" class="pin-key" data-key="0">0</button>
+          <button type="button" class="pin-key pin-key-backspace" id="pinBackspace" aria-label="Delete digit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2z"/><path d="M18 9l-6 6M12 9l6 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="pin-processing-panel" id="pinProcessingPanel" hidden>
+        <div class="pin-spinner" aria-hidden="true"></div>
+        <p class="pin-processing-text" id="pinProcessingText">Processing…</p>
+      </div>
+
+    </div>
+
+    <div class="pin-modal-footer" id="pinModalFooter">
+      <a href="#" class="pin-forgot-link">Forgot your PIN?</a>
+      <button type="button" class="pin-cancel-btn" id="pinModalCancel">Cancel</button>
+    </div>
+
+  </div>
+</div>
+

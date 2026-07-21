@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Funding Details{% endblock %}
+{% block page_title %}Payment Pending{% endblock %}
+{% block page_subtitle %}<p>Complete your bank transfer to fund your wallet.</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/wallet.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="narrow-shell">
+
+  <div class="state-icon-ring">
+    <div class="ring"></div><div class="ring"></div>
+    <div class="state-icon-core">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    </div>
+  </div>
+
+  <div class="buy-card">
+    <div class="virtual-account-card">
+      <div class="live-strip">
+        <span class="pulse-dot"></span> Waiting for your transfer…
+      </div>
+
+      <div class="va-row big">
+        <div>
+          <div class="va-label">Amount</div>
+          <div class="va-value mono-lg">₦{{ funding.amount|intcomma }}</div>
+        </div>
+      </div>
+
+      <div class="va-row">
+        <div>
+          <div class="va-label">Reference</div>
+          <div class="va-value">{{ funding.reference_number }}</div>
+        </div>
+        <button type="button" class="copy-btn-lg" id="copyRefBtn" data-copy="{{ funding.reference_number }}">Copy</button>
+      </div>
+
+      <div class="va-row">
+        <div class="va-label">Bank</div>
+        <div class="va-value">{{ funding.bank_name }}</div>
+      </div>
+
+      <div class="va-row">
+        <div class="va-label">Account name</div>
+        <div class="va-value">{{ funding.account_name }}</div>
+      </div>
+
+      <div class="va-row">
+        <div class="va-label">Account number</div>
+        <div class="va-value mono-lg">{{ funding.account_number }}</div>
+      </div>
+    </div>
+
+    <div class="alert alert-info" style="margin-top:20px;">
+      <strong>Important:</strong> include reference <code>{{ funding.reference_number }}</code> in your transfer description, or confirmation may be delayed.
+    </div>
+
+    <form method="post" action="{% url 'wallet:confirm_payment' funding.request_id %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:4px;">I've made the transfer — confirm payment</button>
+    </form>
+  </div>
+
+  <div class="cancel-link-row">
+    <a href="{% url 'wallet:wallet' %}">Cancel and go back</a>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.getElementById('copyRefBtn').addEventListener('click', function () {
+    navigator.clipboard.writeText(this.dataset.copy).then(() => {
+      const original = this.textContent;
+      this.textContent = 'Copied!';
+      setTimeout(() => (this.textContent = original), 1500);
+    });
+  });
+</script>
+{% endblock %}

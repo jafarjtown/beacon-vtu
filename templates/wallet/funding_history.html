@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Funding History{% endblock %}
+{% block page_title %}Funding History{% endblock %}
+{% block page_subtitle %}<p>Every wallet top-up, all in one place.</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/transactions.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="tx-toolbar">
+  <div></div>
+  <a href="{% url 'wallet:fund' %}" class="btn btn-primary">+ Fund wallet</a>
+</div>
+
+<div class="tx-table full">
+  <div class="tx-row head">
+    <div></div>
+    <div>Reference</div>
+    <div class="col-status">Status</div>
+    <div>Bank</div>
+    <div>Amount</div>
+  </div>
+
+  {% for fund in fundings %}
+  <div class="tx-row">
+    <div class="tx-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </div>
+    <div class="tx-desc">
+      <div class="t1">{{ fund.request_id }}</div>
+      <div class="t2">{{ fund.created_at|date:"d M Y, g:i A" }}</div>
+    </div>
+    <div class="col-status">
+      <span class="badge badge-{% if fund.status == 'confirmed' %}success{% elif fund.status == 'pending' %}pending{% else %}failed{% endif %}">
+        {{ fund.get_status_display }}
+      </span>
+    </div>
+    <div class="tx-balance">{{ fund.bank_name }}</div>
+    <div class="tx-amount pos">+₦{{ fund.amount|intcomma }}</div>
+  </div>
+  {% empty %}
+  <div class="tx-row">
+    <div></div>
+    <div class="tx-desc"><div class="t1" style="color:var(--text-dimmer);">No funding history yet.</div></div>
+    <div class="col-status"></div>
+    <div></div>
+    <div></div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if not fundings %}
+  <div style="text-align:center; margin-top:20px;">
+    <a href="{% url 'wallet:fund' %}" class="btn btn-primary">Fund wallet</a>
+  </div>
+{% endif %}
+
+{% endblock %}

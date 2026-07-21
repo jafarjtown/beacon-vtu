@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My claim links{% endblock %}
+{% block page_title %}My claim links{% endblock %}
+{% block page_subtitle %}<p>Share links.</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/links.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="links-toolbar">
+  <div class="filter-tabs">
+    <a href="?status=all" class="filter-tab {% if active_filter == 'all' or not active_filter %}active{% endif %}">All</a>
+    <a href="?status=active" class="filter-tab {% if active_filter == 'active' %}active{% endif %}">Active</a>
+    <a href="?status=exhausted" class="filter-tab {% if active_filter == 'exhausted' %}active{% endif %}">Exhausted</a>
+    <a href="?status=expired" class="filter-tab {% if active_filter == 'expired' %}active{% endif %}">Expired</a>
+    <a href="?status=disabled" class="filter-tab {% if active_filter == 'disabled' %}active{% endif %}">Disabled</a>
+  </div>
+  <a href="{% url 'links:create' %}" class="btn btn-primary">+ Create link</a>
+</div>
+
+{% if links %}
+<div class="link-cards-grid">
+  {% for link in links %}
+  <div class="link-card">
+    <div class="link-card-top">
+      <div class="link-card-service">
+        <div class="ic">
+          {% if link.service_type == 'data' %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20a8 8 0 100-16 8 8 0 000 16z"/><path d="M12 16a4 4 0 100-8 4 4 0 000 8z"/></svg>
+          {% else %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+          {% endif %}
+        </div>
+        <div>
+          <div class="nm">{{ link.item_label }}</div>
+          <div class="sub">{{ link.provider }}</div>
+        </div>
+      </div>
+      <span class="status-badge status-{{ link.status|default:'active' }}">{{ link.get_status_display }}</span>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress-fill" style="width:{{ link.percent_claimed }}%;"></div>
+    </div>
+    <div class="progress-label">
+      <span>{{ link.used_slots }} of {{ link.total_slots }} claimed</span>
+      <span>Expires in {{ link.expires_in_days }}</span>
+    </div>
+
+    <div class="link-url-row">
+      <span>{{ link.get_absolute_url }}</span>
+      <button type="button" class="copy-btn" data-copy="{{ link.get_absolute_url }}">Copy</button>
+    </div>
+
+    <div class="link-card-footer">
+      <span class="meta">Created {{ link.created_at|date:"d M"|default:"12 Jul" }}</span>
+      <a href="{% url 'links:detail' link.link_id %}">View details →</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg></div>
+  <h3>No claim links yet</h3>
+  <p>Create one to send airtime or data to anyone — they won't need a Beacon account to receive it.</p>
+  <a href="{% url 'links:create' %}" class="btn btn-primary">Create your first link</a>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText('https://' + btn.dataset.copy).then(() => {
+        const original = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = original, 1500);
+      });
+    });
+  });
+</script>
+{% endblock %}

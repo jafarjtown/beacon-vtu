@@ -1,0 +1,24 @@
+{% load humanize %}
+<div class="tx-row">
+      <div class="tx-icon">
+        {% if tx.transaction_type == 'airtime' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      {% elif tx.transaction_type == 'data' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20a8 8 0 100-16 8 8 0 000 16z"/><path d="M12 16a4 4 0 100-8 4 4 0 000 8z"/></svg>
+      {% elif tx.transaction_type == 'claim_link' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg>
+      {% else %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>
+      {% endif %}
+      </div>
+      <div class="tx-desc">
+        <div class="t1">{{ tx.plan_name }}</div>
+        <div class="t2">{{ tx.reference_number|truncatechars:"6" }} · {{ tx.created_at|date:"d M, g:i A" }}</div>
+      </div>
+      <div class="col-status">
+        <span class="badge badge-{{ tx.status }}">{{ tx.get_status_display|default:tx.status }}</span>
+      </div>
+      <div class="tx-amount {% if tx.type == 'funding' %}pos{% else %}neg{% endif %}">
+        {% if tx.type == 'funding' or tx.type == 'refund' %}+{% else %}−{% endif %}₦{{ tx.amount|intcomma }}
+      </div>
+    </div>
