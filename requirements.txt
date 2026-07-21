@@ -4,3 +4,4 @@ qrcode
 whitenoise
 phonenumbers
 uuid
+requests
