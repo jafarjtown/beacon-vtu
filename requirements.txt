@@ -6,3 +6,4 @@ phonenumbers
 uuid
 requests
 pytz
+django-ratelimit
