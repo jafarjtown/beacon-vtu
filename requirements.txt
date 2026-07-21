@@ -1,5 +1,5 @@
 django
-unicorn
+gunicorn
 qrcode
 whitenoise
 phonenumbers
