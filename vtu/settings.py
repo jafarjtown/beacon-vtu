@@ -27,12 +27,6 @@ DJANGO_APPS = [
     'django.contrib.humanize',
 ]
 
-THIRD_PARTY_APPS = [
-    'crispy_forms',
-    'crispy_bootstrap5',
-    'django_htmx',
-]
-
 LOCAL_APPS = [
     'core',
     'authentication',
@@ -44,7 +38,7 @@ LOCAL_APPS = [
     'notifications',
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
