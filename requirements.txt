@@ -1,0 +1,6 @@
+django
+unicorn
+qrcode
+whitenoise
+phonenumbers
+uuid
