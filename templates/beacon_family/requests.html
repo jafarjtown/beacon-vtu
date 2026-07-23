@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Purchase requests{% endblock %}
+{% block page_title %}Purchase requests{% endblock %}
+{% block page_subtitle %}<p>{{ family.name }}</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/family.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{% if membership.can_request_purchase %}
+<div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+  <a href="{% url 'beacon_family:create_request' family_id=family.id %}" class="btn btn-primary">+ Request a purchase</a>
+</div>
+{% endif %}
+
+{% if requests %}
+  {% for req in requests %}
+  <div class="request-card">
+    <div class="request-top" {% if req.preset.service_type != 'airtime' %}style="flex-direction: column;"{% endif %}>
+      <div>
+        <div class="request-who">{{ req.requested_by.user }}</div>
+        <div class="request-what">{{ req.preset.label }} · {{ req.preset.get_service_type_display }}</div>
+      </div>
+      {% if req.preset.service_type == 'data' %}
+      <div class="request-amount">{{ req.plan.name }}</div>
+      {% else %}
+      <div class="request-amount">₦{{ req.amount }}</div>
+      {% endif %}
+    </div>
+
+    {% if req.note %}
+    <div class="request-note">"{{ req.note }}"</div>
+    {% endif %}
+
+    {% if req.status == 'pending' %}
+      {% if membership.can_approve_requests %}
+      <div class="request-actions">
+        <form method="post" action="{% url 'beacon_family:approve_request' family_id=family.id request_id=req.id %}">
+          {% csrf_token %}
+          <button startLoading type="submit" class="btn btn-primary btn-block">Approve</button>
+        </form>
+        <form method="post" action="{% url 'beacon_family:reject_request' family_id=family.id request_id=req.id %}">
+          {% csrf_token %}
+          <button startLoading type="submit" class="btn btn-ghost btn-block">Reject</button>
+        </form>
+      </div>
+      {% else %}
+      <span class="status-chip status-invited">Awaiting approval</span>
+      {% endif %}
+    {% elif req.status == 'approved' %}
+      <span class="badge badge-success">Approved</span>
+    {% else %}
+      <span class="badge badge-failed">Rejected</span>
+      {% if req.rejection_reason %}<div class="request-note" style="margin-top:10px;">{{ req.rejection_reason }}</div>{% endif %}
+    {% endif %}
+
+    <div class="request-meta">Requested {{ req.created_at|date:"d M Y, g:i A" }}</div>
+  </div>
+  {% endfor %}
+{% else %}
+<div class="empty-state">
+  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg></div>
+  <h3>No requests yet</h3>
+  <p>Members can ask the family wallet to cover a one-off purchase, subject to approval.</p>
+</div>
+{% endif %}
+
+{% endblock %}

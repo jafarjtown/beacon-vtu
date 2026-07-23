@@ -36,6 +36,7 @@ LOCAL_APPS = [
     'links',
     'dashboard',
     'notifications',
+    'commons',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS

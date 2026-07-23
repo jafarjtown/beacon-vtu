@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ family.name }} · Members{% endblock %}
+{% block page_title %}Members{% endblock %}
+{% block page_subtitle %}<p>{{ family.name }}</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/family.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+  {% if membership.can_add_members %}
+  <a href="{% url 'beacon_family:invite_member' family_id=family.id %}" class="btn btn-primary">+ Invite member</a>
+  {% endif %}
+</div>
+
+<div class="member-list">
+  {% for m in members %}
+  <div class="member-row">
+    <div class="member-avatar">{{ m.user.full_name|slice:":1"|default:"?"|upper }}</div>
+    <div class="member-info">
+      <div class="nm">{{ m.user }}</div>
+      <div class="em">Joined {{ m.joined_at|date:"d M Y"|default:"—" }}</div>
+    </div>
+    <div class="member-badges">
+      <span class="role-chip role-{{ m.role }}">{{ m.get_role_display }}</span>
+      {% if m.status == 'invited' %}<span class="status-chip status-invited">Invite pending</span>{% endif %}
+    </div>
+    <div class="member-actions">
+      {% if membership.can_set_spending_limits and m.role != 'owner' %}
+        <a href="{% url 'beacon_family:spending_limits' family_id=family.id membership_id=m.id %}" class="btn btn-ghost btn-sm-inline">Limits</a>
+      {% endif %}
+      {% if membership.can_remove_members and m.role != 'owner' %}
+        <form method="post" action="{% url 'beacon_family:remove_member' family_id=family.id membership_id=m.id %}" onsubmit="return confirm('Remove {{ m.user }} from {{ family.name }}?');">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-ghost btn-sm-inline" style="color:var(--danger);">Remove</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+  {% empty %}
+  <div class="member-row">
+    <div class="member-info"><div class="nm" style="color:var(--text-dimmer);">No members yet.</div></div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

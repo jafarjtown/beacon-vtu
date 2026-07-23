@@ -1,357 +1,218 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beacon — Airtime, Data & Bills, Delivered Instantly</title>
+<title>Beacon — One Wallet for Airtime, Data, Bills, Claim Links & Family</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0B0E1F;
-    --bg-elev:#12162E;
-    --bg-elev-2:#171C38;
-    --text:#F3F1EA;
-    --text-dim:#9CA1C4;
-    --text-dimmer:#6B7098;
-    --amber:#FFB020;
-    --amber-dim:#8A6420;
-    --mint:#00D9A3;
-    --violet:#7C6CFF;
-    --border:rgba(255,255,255,0.08);
-    --border-strong:rgba(255,255,255,0.14);
+    --bg:#0B0E1F; --bg-elev:#12162E; --bg-elev-2:#171C38;
+    --text:#F3F1EA; --text-dim:#9CA1C4; --text-dimmer:#6B7098;
+    --amber:#FFB020; --mint:#00D9A3; --violet:#7C6CFF;
+    --border:rgba(255,255,255,0.08); --border-strong:rgba(255,255,255,0.14);
     --radius:14px;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
-  body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:'Inter',sans-serif;
-    line-height:1.6;
-    overflow-x:hidden;
-  }
-  body.light{
-    --bg:#F6F5F1;
-    --bg-elev:#FFFFFF;
-    --bg-elev-2:#EFEDE6;
-    --text:#12162E;
-    --text-dim:#4B4F6B;
-    --text-dimmer:#787C99;
-    --border:rgba(18,22,46,0.1);
-    --border-strong:rgba(18,22,46,0.18);
-  }
-  h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:-0.02em;}
+  body{background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.6; overflow-x:hidden;}
+  h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; font-weight:600; letter-spacing:-0.02em;}
   .mono{font-family:'IBM Plex Mono',monospace;}
-  a{color:inherit;text-decoration:none;}
+  a{color:inherit; text-decoration:none;}
   ul{list-style:none;}
-  img,svg{display:block;max-width:100%;}
-  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
-  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+  img{display:block; max-width:100%;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 32px;}
   @media(max-width:640px){.wrap{padding:0 20px;}}
-
-  /* Reduced motion */
-  @media (prefers-reduced-motion: reduce){
-    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important;}
-  }
-
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important;} }
   :focus-visible{outline:2px solid var(--mint); outline-offset:3px;}
+  ::selection{background:var(--amber); color:#171106;}
 
   /* ---------- NAV ---------- */
-  header{
-    position:fixed; top:0; left:0; right:0; z-index:100;
-    background:rgba(11,14,31,0.72);
-    backdrop-filter:blur(14px);
-    border-bottom:1px solid var(--border);
-    transition:background .3s;
-  }
-  body.light header{background:rgba(246,245,241,0.78);}
-  nav{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:16px 32px; max-width:1180px; margin:0 auto;
-  }
+  header{position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(11,14,31,0.75); backdrop-filter:blur(14px); border-bottom:1px solid var(--border);}
+  nav{display:flex; align-items:center; justify-content:space-between; padding:16px 32px; max-width:1180px; margin:0 auto;}
   .logo{display:flex; align-items:center; gap:10px; font-family:'Space Grotesk'; font-weight:700; font-size:19px;}
   .logo .bars{display:flex; align-items:flex-end; gap:2.5px; height:16px;}
   .logo .bars span{width:3.5px; background:var(--amber); border-radius:1px; animation:barpulse 1.8s ease-in-out infinite;}
-  .logo .bars span:nth-child(1){height:40%; animation-delay:0s;}
-  .logo .bars span:nth-child(2){height:65%; animation-delay:.2s;}
-  .logo .bars span:nth-child(3){height:100%; animation-delay:.4s;}
-  .logo .bars span:nth-child(4){height:80%; animation-delay:.6s;}
+  .logo .bars span:nth-child(1){height:40%;} .logo .bars span:nth-child(2){height:65%; animation-delay:.2s;}
+  .logo .bars span:nth-child(3){height:100%; animation-delay:.4s;} .logo .bars span:nth-child(4){height:80%; animation-delay:.6s;}
   @keyframes barpulse{0%,100%{opacity:.45;}50%{opacity:1;}}
-
-  .nav-links{display:flex; gap:34px; font-size:14.5px; color:var(--text-dim);}
-  .nav-links a{transition:color .2s;}
+  .nav-links{display:flex; gap:30px; font-size:14px; color:var(--text-dim);}
   .nav-links a:hover{color:var(--text);}
   .nav-actions{display:flex; align-items:center; gap:14px;}
-  .btn{
-    display:inline-flex; align-items:center; justify-content:center; gap:8px;
-    padding:11px 22px; border-radius:999px; font-size:14.5px; font-weight:600;
-    transition:transform .15s, box-shadow .15s, background .2s, border-color .2s;
-    white-space:nowrap;
-  }
+  .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 22px; border-radius:999px; font-size:14.5px; font-weight:600; transition:transform .15s, box-shadow .15s, border-color .2s;}
   .btn:active{transform:scale(0.97);}
   .btn-primary{background:var(--amber); color:#171106;}
   .btn-primary:hover{box-shadow:0 0 0 5px rgba(255,176,32,0.16);}
   .btn-ghost{color:var(--text-dim); border:1px solid var(--border-strong);}
   .btn-ghost:hover{color:var(--text); border-color:var(--text-dim);}
-  .icon-toggle{
-    width:38px; height:38px; border-radius:50%; border:1px solid var(--border-strong);
-    display:flex; align-items:center; justify-content:center; font-size:16px;
-  }
-  .nav-burger{display:none;}
-  @media(max-width:900px){
-    .nav-links{display:none;}
-    .nav-burger{display:flex; width:38px;height:38px;align-items:center;justify-content:center;border:1px solid var(--border-strong);border-radius:8px;}
-    .nav-actions .btn-ghost{display:none;}
-  }
+  .btn-lg{padding:15px 28px; font-size:15.5px;}
+  @media(max-width:900px){.nav-links{display:none;} .nav-actions .btn-ghost{display:none;}}
 
   /* ---------- HERO ---------- */
-  .hero{
-    position:relative; padding:168px 0 100px; overflow:hidden;
-  }
-  .hero-grid{
-    display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center;
-  }
-  @media(max-width:900px){.hero-grid{grid-template-columns:1fr;} .hero{padding:140px 0 70px;}}
-
-  .eyebrow{
-    display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono';
-    font-size:12.5px; letter-spacing:.06em; color:var(--mint);
-    border:1px solid rgba(0,217,163,0.3); background:rgba(0,217,163,0.08);
-    padding:6px 14px; border-radius:999px; margin-bottom:26px;
-  }
-  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--mint); box-shadow:0 0 0 0 rgba(0,217,163,.6); animation:ping 1.8s ease-out infinite;}
+  .hero{position:relative; padding:158px 0 90px; overflow:hidden;}
+  .hero-grid{display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center;}
+  @media(max-width:900px){.hero-grid{grid-template-columns:1fr;} .hero{padding:132px 0 60px;}}
+  .eyebrow{display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono'; font-size:12.5px; letter-spacing:.06em; color:var(--mint); border:1px solid rgba(0,217,163,0.3); background:rgba(0,217,163,0.08); padding:6px 14px; border-radius:999px; margin-bottom:24px;}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--mint); animation:ping 1.8s ease-out infinite;}
   @keyframes ping{0%{box-shadow:0 0 0 0 rgba(0,217,163,.55);}70%{box-shadow:0 0 0 9px rgba(0,217,163,0);}100%{box-shadow:0 0 0 0 rgba(0,217,163,0);}}
-
-  .hero h1{
-    font-size:clamp(36px,5.4vw,60px); line-height:1.06; margin-bottom:22px;
-  }
+  .hero h1{font-size:clamp(34px,5vw,54px); line-height:1.08; margin-bottom:20px;}
   .hero h1 em{font-style:normal; color:var(--amber);}
-  .hero p.lead{font-size:18px; color:var(--text-dim); max-width:480px; margin-bottom:36px;}
-  .hero-ctas{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:44px;}
-  .btn-lg{padding:15px 28px; font-size:15.5px;}
-
-  .trust-row{display:flex; gap:28px; flex-wrap:wrap; font-size:13px; color:var(--text-dimmer);}
+  .hero p.lead{font-size:17.5px; color:var(--text-dim); max-width:480px; margin-bottom:32px;}
+  .hero-ctas{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:40px;}
+  .trust-row{display:flex; gap:24px; flex-wrap:wrap; font-size:12.5px; color:var(--text-dimmer);}
   .trust-row span{display:flex; align-items:center; gap:7px;}
-  .trust-row svg{width:15px;height:15px; color:var(--mint);}
+  .trust-row svg{width:14px;height:14px; color:var(--mint);}
 
-  /* Signature visual: signal beacon rings */
-  .beacon-visual{
-    position:relative; aspect-ratio:1/1; max-width:440px; margin:0 auto;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .beacon-visual .ring{
-    position:absolute; border-radius:50%; border:1px solid rgba(255,176,32,0.35);
-    animation:radiate 3.6s cubic-bezier(.2,.6,.3,1) infinite;
-  }
-  .beacon-visual .ring:nth-child(1){width:30%; height:30%; animation-delay:0s;}
-  .beacon-visual .ring:nth-child(2){width:30%; height:30%; animation-delay:.9s;}
-  .beacon-visual .ring:nth-child(3){width:30%; height:30%; animation-delay:1.8s;}
-  .beacon-visual .ring:nth-child(4){width:30%; height:30%; animation-delay:2.7s;}
-  @keyframes radiate{
-    0%{width:22%; height:22%; opacity:0.9; border-color:rgba(255,176,32,0.6);}
-    100%{width:100%; height:100%; opacity:0; border-color:rgba(124,108,255,0.05);}
-  }
-  .beacon-core{
-    position:relative; z-index:2; width:132px; height:132px; border-radius:32px;
-    background:linear-gradient(150deg, var(--bg-elev-2), var(--bg-elev));
-    border:1px solid var(--border-strong);
-    display:flex; align-items:center; justify-content:center;
-    box-shadow:0 20px 60px -20px rgba(255,176,32,0.35);
-  }
-  .beacon-core .bars{display:flex; align-items:flex-end; gap:6px; height:52px;}
-  .beacon-core .bars span{width:9px; border-radius:3px; background:linear-gradient(180deg, var(--amber), var(--mint));animation:barpulse2 2s ease-in-out infinite;}
-  .beacon-core .bars span:nth-child(1){height:35%; animation-delay:0s;}
-  .beacon-core .bars span:nth-child(2){height:60%; animation-delay:.15s;}
-  .beacon-core .bars span:nth-child(3){height:100%; animation-delay:.3s;}
-  .beacon-core .bars span:nth-child(4){height:75%; animation-delay:.45s;}
-  .beacon-core .bars span:nth-child(5){height:50%; animation-delay:.6s;}
-  @keyframes barpulse2{0%,100%{opacity:.5; transform:scaleY(0.85);}50%{opacity:1; transform:scaleY(1);}}
-
-  .float-card{
-    position:absolute; background:var(--bg-elev); border:1px solid var(--border-strong);
-    border-radius:12px; padding:11px 15px; font-size:12.5px; box-shadow:0 14px 40px -12px rgba(0,0,0,0.5);
-    animation:floaty 5s ease-in-out infinite;
-  }
-  .float-card.fc1{top:6%; left:-6%; animation-delay:0s;}
-  .float-card.fc2{bottom:10%; right:-8%; animation-delay:1.4s;}
-  .float-card .label{color:var(--text-dimmer); font-family:'IBM Plex Mono'; font-size:10.5px; margin-bottom:2px;}
-  .float-card .val{font-weight:600; display:flex; align-items:center; gap:6px;}
-  .float-card .val.ok{color:var(--mint);}
-  @keyframes floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
-  @media(max-width:520px){.float-card{display:none;}}
+  /* ---------- PHONE FRAME ---------- */
+  .phone-frame{position:relative; width:250px; margin:0 auto; border-radius:34px; padding:9px; background:linear-gradient(160deg,#1c2040,#0d0f1f); box-shadow:0 40px 90px -25px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.06); flex-shrink:0;}
+  .phone-frame::before{content:''; position:absolute; top:9px; left:50%; transform:translateX(-50%); width:84px; height:20px; background:#0d0f1f; border-radius:0 0 13px 13px; z-index:2;}
+  .phone-frame img{width:100%; border-radius:25px; display:block;}
+  .phone-frame.lg{width:280px;}
+  .hero-phone-wrap{position:relative; display:flex; justify-content:center;}
+  .hero-phone-wrap .glow{position:absolute; width:320px; height:320px; border-radius:50%; background:radial-gradient(circle, rgba(255,176,32,0.16), transparent 70%); top:50%; left:50%; transform:translate(-50%,-50%); z-index:0;}
+  .hero-phone-wrap .phone-frame{position:relative; z-index:1; animation:floaty 6s ease-in-out infinite;}
+  @keyframes floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
 
   /* ---------- TICKER ---------- */
-  .ticker-bar{
-    border-top:1px solid var(--border); border-bottom:1px solid var(--border);
-    background:var(--bg-elev); padding:14px 0; overflow:hidden;
-  }
+  .ticker-bar{border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:var(--bg-elev); padding:14px 0; overflow:hidden;}
   .ticker-track{display:flex; gap:60px; white-space:nowrap; animation:scroll 26s linear infinite; width:max-content;}
-  .ticker-track span{font-family:'IBM Plex Mono'; font-size:13px; color:var(--text-dim); display:flex; align-items:center; gap:10px;}
+  .ticker-track span{font-family:'IBM Plex Mono'; font-size:13px; color:var(--text-dim);}
   .ticker-track span b{color:var(--text); font-weight:500;}
   @keyframes scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
 
-  /* ---------- SECTION SHARED ---------- */
-  section{padding:110px 0;}
-  @media(max-width:640px){section{padding:74px 0;}}
-  .section-head{max-width:600px; margin-bottom:56px;}
+  section{padding:104px 0;}
+  @media(max-width:640px){section{padding:70px 0;}}
+  .section-head{max-width:600px; margin-bottom:52px;}
+  .section-head.center{margin-left:auto; margin-right:auto; text-align:center;}
   .section-head .eyebrow{margin-bottom:18px;}
-  .section-head h2{font-size:clamp(28px,3.6vw,40px); margin-bottom:14px;}
-  .section-head p{color:var(--text-dim); font-size:16.5px;}
+  .section-head h2{font-size:clamp(27px,3.4vw,38px); margin-bottom:14px;}
+  .section-head p{color:var(--text-dim); font-size:16px;}
 
   /* ---------- FEATURES ---------- */
-  .feat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px;}
+  .feat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
   @media(max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr);}}
   @media(max-width:600px){.feat-grid{grid-template-columns:1fr;}}
-  .feat-card{
-    background:var(--bg-elev); border:1px solid var(--border); border-radius:var(--radius);
-    padding:28px; transition:border-color .2s, transform .2s;
-  }
+  .feat-card{background:var(--bg-elev); border:1px solid var(--border); border-radius:var(--radius); padding:26px; transition:border-color .2s, transform .2s;}
   .feat-card:hover{border-color:var(--border-strong); transform:translateY(-3px);}
-  .feat-icon{
-    width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center;
-    background:rgba(255,176,32,0.1); color:var(--amber); margin-bottom:18px;
-  }
-  .feat-card h3{font-size:17px; margin-bottom:9px;}
-  .feat-card p{color:var(--text-dim); font-size:14.5px;}
-  .feat-card.highlight{border-color:rgba(0,217,163,0.35); background:linear-gradient(160deg, rgba(0,217,163,0.07), var(--bg-elev));}
-  .feat-card.highlight .feat-icon{background:rgba(0,217,163,0.12); color:var(--mint);}
+  .feat-icon{width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:rgba(255,176,32,0.1); color:var(--amber); margin-bottom:16px;}
+  .feat-card h3{font-size:16.5px; margin-bottom:8px;}
+  .feat-card p{color:var(--text-dim); font-size:14px;}
+  .feat-card.mint .feat-icon{background:rgba(0,217,163,0.12); color:var(--mint);}
+  .feat-card.violet .feat-icon{background:rgba(124,108,255,0.12); color:var(--violet);}
+
+  /* ---------- SHOWCASE STRIP ---------- */
+  .showcase-scroller{display:flex; gap:24px; overflow-x:auto; padding:10px 4px 24px; scroll-snap-type:x mandatory;}
+  .showcase-scroller::-webkit-scrollbar{height:6px;}
+  .showcase-scroller::-webkit-scrollbar-thumb{background:var(--border-strong); border-radius:99px;}
+  .showcase-item{flex-shrink:0; scroll-snap-align:start; text-align:center; width:250px;}
+  .showcase-item .cap{margin-top:18px; font-size:14.5px; font-weight:600;}
+  .showcase-item .sub{font-size:12.5px; color:var(--text-dimmer); margin-top:4px; max-width:230px; margin-left:auto; margin-right:auto;}
+
+  /* ---------- FEATURE DEEP-DIVE (claim links / family) ---------- */
+  .deep-dive{display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;}
+  @media(max-width:900px){.deep-dive{grid-template-columns:1fr; gap:44px;}}
+  .deep-dive.reverse .dd-text{order:2;} .deep-dive.reverse .dd-visual{order:1;}
+  @media(max-width:900px){.deep-dive.reverse .dd-text, .deep-dive.reverse .dd-visual{order:0;}}
+  .dd-text h2{font-size:clamp(26px,3.2vw,34px); margin-bottom:16px;}
+  .dd-text > p{color:var(--text-dim); font-size:15.5px; margin-bottom:28px;}
+  .dd-points{display:flex; flex-direction:column; gap:20px;}
+  .dd-point{display:flex; gap:14px;}
+  .dd-point .pi{width:36px; height:36px; border-radius:10px; background:rgba(255,176,32,0.1); color:var(--amber); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .dd-point .pi svg{width:17px; height:17px;}
+  .dd-point h4{font-size:15px; margin-bottom:3px;}
+  .dd-point p{font-size:13.5px; color:var(--text-dim);}
+  .dd-visual{display:flex; justify-content:center;}
+
+  /* ---------- ROLE CHIPS (family section) ---------- */
+  .role-strip{display:flex; gap:10px; flex-wrap:wrap; margin-top:28px;}
+  .role-pill{display:flex; align-items:center; gap:8px; padding:9px 15px; border-radius:999px; background:var(--bg-elev-2); border:1px solid var(--border-strong); font-size:12.5px; font-weight:500;}
+  .role-pill .d{width:8px; height:8px; border-radius:50%;}
 
   /* ---------- SERVICES CHIPS ---------- */
-  .services-block{
-    background:var(--bg-elev); border:1px solid var(--border); border-radius:20px; padding:44px;
-  }
-  @media(max-width:640px){.services-block{padding:26px;}}
-  .service-cat{margin-bottom:30px;}
-  .service-cat:last-child{margin-bottom:0;}
-  .service-cat .cat-label{font-family:'IBM Plex Mono'; font-size:12px; color:var(--text-dimmer); letter-spacing:.06em; margin-bottom:14px; text-transform:uppercase;}
+  .services-block{background:var(--bg-elev); border:1px solid var(--border); border-radius:20px; padding:40px;}
+  @media(max-width:640px){.services-block{padding:24px;}}
+  .service-cat{margin-bottom:26px;} .service-cat:last-child{margin-bottom:0;}
+  .service-cat .cat-label{font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--text-dimmer); letter-spacing:.06em; margin-bottom:12px; text-transform:uppercase;}
   .chip-row{display:flex; flex-wrap:wrap; gap:10px;}
-  .chip{
-    display:flex; align-items:center; gap:9px; padding:9px 16px; border-radius:10px;
-    background:var(--bg-elev-2); border:1px solid var(--border); font-size:13.5px; font-weight:500;
-  }
+  .chip{display:flex; align-items:center; gap:9px; padding:9px 16px; border-radius:10px; background:var(--bg-elev-2); border:1px solid var(--border); font-size:13px; font-weight:500;}
   .chip .swatch{width:9px;height:9px;border-radius:3px;}
 
-  /* ---------- CLAIM LINK SHOWCASE ---------- */
-  .claim-section{position:relative;}
-  .claim-grid{display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;}
-  @media(max-width:900px){.claim-grid{grid-template-columns:1fr; gap:44px;}}
-  .steps{display:flex; flex-direction:column; gap:22px; margin-top:8px;}
-  .step{display:flex; gap:16px;}
-  .step .num{
-    font-family:'IBM Plex Mono'; font-size:13px; color:var(--amber); border:1px solid rgba(255,176,32,0.35);
-    width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  }
-  .step h4{font-size:15.5px; margin-bottom:4px;}
-  .step p{font-size:14px; color:var(--text-dim);}
-
-  .phone-mock{
-    background:var(--bg-elev); border:1px solid var(--border-strong); border-radius:26px; padding:26px;
-    max-width:340px; margin:0 auto; box-shadow:0 30px 80px -30px rgba(0,0,0,0.6);
-  }
-  .phone-mock .chatline{
-    background:var(--bg-elev-2); border-radius:14px 14px 14px 4px; padding:14px 16px; font-size:13.5px;
-    margin-bottom:14px; max-width:88%; color:var(--text-dim);
-  }
-  .link-card{
-    background:linear-gradient(150deg, rgba(255,176,32,0.12), rgba(124,108,255,0.08));
-    border:1px solid rgba(255,176,32,0.3); border-radius:14px; padding:18px; margin-bottom:16px;
-  }
-  .link-card .lab{font-family:'IBM Plex Mono'; font-size:10.5px; color:var(--amber); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px;}
-  .link-card .url{font-family:'IBM Plex Mono'; font-size:13px; word-break:break-all;}
-  .link-card .meta{display:flex; justify-content:space-between; margin-top:12px; font-size:11.5px; color:var(--text-dimmer);}
-  .claim-btn{width:100%; background:var(--mint); color:#04241a; padding:13px; border-radius:10px; font-weight:600; font-size:14px; text-align:center;}
-  .pin-row{display:flex; gap:8px; margin-top:14px; justify-content:center;}
-  .pin-row div{width:34px; height:40px; border:1px solid var(--border-strong); border-radius:8px; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono'; color:var(--text-dim);}
-
   /* ---------- PRICING ---------- */
-  .pricing-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:24px;}
+  .pricing-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:22px;}
   @media(max-width:760px){.pricing-grid{grid-template-columns:1fr;}}
-  .price-card{
-    background:var(--bg-elev); border:1px solid var(--border); border-radius:18px; padding:36px;
-  }
+  .price-card{background:var(--bg-elev); border:1px solid var(--border); border-radius:18px; padding:32px;}
   .price-card.pro{border-color:rgba(255,176,32,0.4); background:linear-gradient(165deg, rgba(255,176,32,0.08), var(--bg-elev));}
-  .price-card .tag{font-family:'IBM Plex Mono'; font-size:12px; color:var(--text-dimmer); text-transform:uppercase; letter-spacing:.05em;}
-  .price-card h3{font-size:22px; margin:10px 0 6px;}
-  .price-card .sub{color:var(--text-dim); font-size:14px; margin-bottom:24px;}
-  .price-list{display:flex; flex-direction:column; gap:12px; margin-bottom:28px;}
-  .price-list li{display:flex; gap:10px; font-size:14px; color:var(--text-dim); align-items:flex-start;}
-  .price-list svg{width:16px; height:16px; color:var(--mint); flex-shrink:0; margin-top:2px;}
+  .price-card .tag{font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--text-dimmer); text-transform:uppercase; letter-spacing:.05em;}
+  .price-card h3{font-size:20px; margin:8px 0 5px;}
+  .price-card .sub{color:var(--text-dim); font-size:13.5px; margin-bottom:22px;}
+  .price-list{display:flex; flex-direction:column; gap:11px; margin-bottom:26px;}
+  .price-list li{display:flex; gap:9px; font-size:13.5px; color:var(--text-dim); align-items:flex-start;}
+  .price-list svg{width:15px; height:15px; color:var(--mint); flex-shrink:0; margin-top:2px;}
 
-  /* ---------- WHY ---------- */
-  .why-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:22px;}
+  /* ---------- WHY / STATS ---------- */
+  .why-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:20px;}
   @media(max-width:900px){.why-grid{grid-template-columns:repeat(2,1fr);}}
   @media(max-width:520px){.why-grid{grid-template-columns:1fr;}}
-  .why-item .big{font-family:'Space Grotesk'; font-size:34px; color:var(--amber); margin-bottom:8px;}
-  .why-item p{color:var(--text-dim); font-size:13.5px;}
-  .why-item{border-left:2px solid var(--border-strong); padding-left:18px;}
+  .why-item{border-left:2px solid var(--border-strong); padding-left:16px;}
+  .why-item .big{font-family:'Space Grotesk'; font-size:32px; color:var(--amber); margin-bottom:6px;}
+  .why-item p{color:var(--text-dim); font-size:13px;}
 
   /* ---------- TESTIMONIALS ---------- */
-  .test-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px;}
+  .test-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
   @media(max-width:900px){.test-grid{grid-template-columns:1fr;}}
-  .test-card{background:var(--bg-elev); border:1px solid var(--border); border-radius:var(--radius); padding:28px;}
-  .test-card p.quote{font-size:14.5px; color:var(--text-dim); margin-bottom:20px;}
-  .test-who{display:flex; align-items:center; gap:12px;}
-  .avatar{width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; color:#171106;}
-  .test-who .name{font-size:13.5px; font-weight:600;}
-  .test-who .role{font-size:12px; color:var(--text-dimmer);}
+  .test-card{background:var(--bg-elev); border:1px solid var(--border); border-radius:var(--radius); padding:26px;}
+  .test-card p.quote{font-size:14px; color:var(--text-dim); margin-bottom:18px;}
+  .test-who{display:flex; align-items:center; gap:11px;}
+  .avatar{width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:12.5px; color:#171106;}
+  .test-who .name{font-size:13px; font-weight:600;} .test-who .role{font-size:11.5px; color:var(--text-dimmer);}
 
   /* ---------- FAQ ---------- */
   .faq-list{max-width:760px;}
   .faq-item{border-bottom:1px solid var(--border);}
-  .faq-q{
-    width:100%; display:flex; justify-content:space-between; align-items:center;
-    padding:22px 4px; font-size:15.5px; font-weight:500; text-align:left; font-family:'Space Grotesk';
-  }
-  .faq-q .plus{font-size:20px; color:var(--amber); transition:transform .25s; flex-shrink:0; margin-left:16px;}
+  .faq-q{width:100%; display:flex; justify-content:space-between; align-items:center; padding:20px 4px; font-size:15px; font-weight:500; text-align:left; font-family:'Space Grotesk';}
+  .faq-q .plus{font-size:19px; color:var(--amber); transition:transform .25s; flex-shrink:0; margin-left:16px;}
   .faq-item.open .faq-q .plus{transform:rotate(45deg);}
   .faq-a{max-height:0; overflow:hidden; transition:max-height .3s ease;}
-  .faq-a p{padding:0 4px 22px; color:var(--text-dim); font-size:14.5px; max-width:640px;}
+  .faq-a p{padding:0 4px 20px; color:var(--text-dim); font-size:14px; max-width:640px;}
 
-  /* ---------- CTA BANNER ---------- */
-  .cta-banner{
-    background:linear-gradient(135deg, rgba(255,176,32,0.14), rgba(124,108,255,0.1));
-    border:1px solid rgba(255,176,32,0.25); border-radius:24px; padding:64px 48px;
-    text-align:center; position:relative; overflow:hidden;
-  }
-  @media(max-width:640px){.cta-banner{padding:44px 24px;}}
-  .cta-banner h2{font-size:clamp(26px,4vw,38px); margin-bottom:16px;}
-  .cta-banner p{color:var(--text-dim); margin-bottom:32px; font-size:16px;}
+  /* ---------- CTA ---------- */
+  .cta-banner{background:linear-gradient(135deg, rgba(255,176,32,0.14), rgba(124,108,255,0.1)); border:1px solid rgba(255,176,32,0.25); border-radius:24px; padding:60px 44px; text-align:center;}
+  @media(max-width:640px){.cta-banner{padding:40px 22px;}}
+  .cta-banner h2{font-size:clamp(25px,3.8vw,36px); margin-bottom:14px;}
+  .cta-banner p{color:var(--text-dim); margin-bottom:30px; font-size:15.5px;}
 
   /* ---------- FOOTER ---------- */
-  footer{border-top:1px solid var(--border); padding:64px 0 32px;}
-  .footer-grid{display:grid; grid-template-columns:1.4fr repeat(3,1fr); gap:40px; margin-bottom:56px;}
-  @media(max-width:760px){.footer-grid{grid-template-columns:1fr 1fr; row-gap:36px;}}
-  .footer-grid h4{font-size:13px; color:var(--text-dimmer); text-transform:uppercase; letter-spacing:.05em; margin-bottom:16px; font-family:'IBM Plex Mono'; font-weight:500;}
-  .footer-grid ul{display:flex; flex-direction:column; gap:11px;}
-  .footer-grid a{color:var(--text-dim); font-size:14px; transition:color .2s;}
+  footer{border-top:1px solid var(--border); padding:60px 0 32px;}
+  .footer-grid{display:grid; grid-template-columns:1.4fr repeat(3,1fr); gap:36px; margin-bottom:50px;}
+  @media(max-width:760px){.footer-grid{grid-template-columns:1fr 1fr; row-gap:32px;}}
+  .footer-grid h4{font-size:12.5px; color:var(--text-dimmer); text-transform:uppercase; letter-spacing:.05em; margin-bottom:15px; font-family:'IBM Plex Mono'; font-weight:500;}
+  .footer-grid ul{display:flex; flex-direction:column; gap:10px;}
+  .footer-grid a{color:var(--text-dim); font-size:13.5px;}
   .footer-grid a:hover{color:var(--text);}
-  .footer-brand p{color:var(--text-dim); font-size:14px; margin:16px 0 20px; max-width:280px;}
+  .footer-brand p{color:var(--text-dim); font-size:13.5px; margin:14px 0 18px; max-width:280px;}
   .social-row{display:flex; gap:12px;}
-  .social-row a{width:36px; height:36px; border:1px solid var(--border-strong); border-radius:50%; display:flex; align-items:center; justify-content:center;}
-  .footer-bottom{display:flex; justify-content:space-between; flex-wrap:wrap; gap:14px; padding-top:28px; border-top:1px solid var(--border); font-size:13px; color:var(--text-dimmer);}
-
-  ::selection{background:var(--amber); color:#171106;}
+  .social-row a{width:34px; height:34px; border:1px solid var(--border-strong); border-radius:50%; display:flex; align-items:center; justify-content:center;}
+  .footer-bottom{display:flex; justify-content:space-between; flex-wrap:wrap; gap:14px; padding-top:26px; border-top:1px solid var(--border); font-size:12.5px; color:var(--text-dimmer);}
 </style>
 </head>
 <body>
 
 <header>
   <nav>
-    <a href="#top" class="logo">
-      <span class="bars"><span></span><span></span><span></span><span></span></span>
-      Beacon
-    </a>
+    <a href="#top" class="logo"><span class="bars"><span></span><span></span><span></span><span></span></span>Beacon</a>
     <ul class="nav-links">
-      <li><a href="#services">Services</a></li>
+      <li><a href="#showcase">Product</a></li>
       <li><a href="#claim-links">Claim Links</a></li>
+      <li><a href="#family">Beacon Family</a></li>
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="#faq">FAQ</a></li>
     </ul>
     <div class="nav-actions">
-      <a href="{% url 'accounts:login' %{" class="btn btn-ghost">Log in</a>
-      <a href="{% url 'accounts:register' %}" class="btn btn-primary">Get started</a>
+      <a href="{% url 'accounts:login' %}" class="btn btn-primary">Login</a>
     </div>
   </nav>
 </header>
@@ -363,31 +224,21 @@
     <div class="wrap hero-grid">
       <div>
         <div class="eyebrow"><span class="dot"></span> Live on MTN, Airtel, Glo & 9mobile</div>
-        <h1>Airtime, data and bills, <em>delivered before the page reloads.</em></h1>
-        <p class="lead">Beacon is the fastest way to recharge, subscribe and pay — for yourself, or for anyone, even if they've never heard of Beacon.</p>
+        <h1>One wallet for <em>everything money-related</em> in your life.</h1>
+        <p class="lead">Airtime, data, electricity, cable and exam pins. Send value to anyone with a claim link — no account needed. Automate payments for your whole family. All from one Beacon wallet.</p>
         <div class="hero-ctas">
-          <a href="#" class="btn btn-primary btn-lg">Create free account →</a>
-          <a href="#claim-links" class="btn btn-ghost btn-lg">See how claim links work</a>
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg">Create free account →</a>
+          <a href="#showcase" class="btn btn-ghost btn-lg">See it in action</a>
         </div>
         <div class="trust-row">
           <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg> No hidden charges</span>
           <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg> Instant delivery</span>
-          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg> Bank-level encryption</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg> PIN-protected wallet</span>
         </div>
       </div>
-      <div class="beacon-visual">
-        <div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div>
-        <div class="beacon-core">
-          <div class="bars"><span></span><span></span><span></span><span></span><span></span></div>
-        </div>
-        <div class="float-card fc1">
-          <div class="label">WALLET BALANCE</div>
-          <div class="val">₦48,250.00</div>
-        </div>
-        <div class="float-card fc2">
-          <div class="label">DATA — MTN 2GB</div>
-          <div class="val ok">✓ Delivered</div>
-        </div>
+      <div class="hero-phone-wrap">
+        <div class="glow"></div>
+        <div class="phone-frame lg"><img src="{% static 'screenshots/dashboard.png' %}" alt="Beacon dashboard showing wallet balance and quick actions"></div>
       </div>
     </div>
   </section>
@@ -397,21 +248,23 @@
       <span><b>₦2,418,300</b> topped up in the last hour</span>
       <span><b>9,204</b> data bundles delivered today</span>
       <span><b>612</b> claim links redeemed today</span>
+      <span><b>118</b> families running on Beacon</span>
       <span><b>99.98%</b> successful delivery rate</span>
       <span><b>₦2,418,300</b> topped up in the last hour</span>
       <span><b>9,204</b> data bundles delivered today</span>
       <span><b>612</b> claim links redeemed today</span>
+      <span><b>118</b> families running on Beacon</span>
       <span><b>99.98%</b> successful delivery rate</span>
     </div>
   </div>
 
-  <!-- FEATURES -->
-  <section id="services">
+  <!-- CORE FEATURES -->
+  <section id="features">
     <div class="wrap">
       <div class="section-head">
         <div class="eyebrow">What you get</div>
-        <h2>One wallet, every network.</h2>
-        <p>Fund once, spend on any service — no juggling apps or USSD codes.</p>
+        <h2>Every service, every network, one balance.</h2>
+        <p>Fund once, spend on anything — no juggling apps, USSD codes, or five different logins.</p>
       </div>
       <div class="feat-grid">
         <div class="feat-card">
@@ -419,15 +272,20 @@
           <h3>Instant delivery</h3>
           <p>Airtime and data land in seconds, with a live status you can watch update.</p>
         </div>
-        <div class="feat-card">
+        <div class="feat-card mint">
           <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
-          <h3>Password-verified purchases</h3>
-          <p>Every purchase is confirmed with your account password before it goes through.</p>
+          <h3>PIN-protected purchases</h3>
+          <p>A quick numeric keypad confirms every purchase — no default keyboard, no shoulder-surfing your password.</p>
         </div>
-        <div class="feat-card highlight">
+        <div class="feat-card">
           <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg></div>
           <h3>Claim links</h3>
           <p>Send airtime or data to anyone with a link — they don't need an account to receive it.</p>
+        </div>
+        <div class="feat-card violet">
+          <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <h3>Beacon Family</h3>
+          <p>One shared wallet, spending limits per member, and payments that repeat automatically.</p>
         </div>
         <div class="feat-card">
           <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
@@ -437,12 +295,106 @@
         <div class="feat-card">
           <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg></div>
           <h3>Full transaction history</h3>
-          <p>Every purchase is logged with balance before and after, filterable by date or service.</p>
+          <p>Every purchase logged with balance before and after, filterable by date or service.</p>
         </div>
-        <div class="feat-card">
-          <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg></div>
-          <h3>Real-time notifications</h3>
-          <p>Know the moment a purchase, funding, or claim-link redemption happens.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOWCASE -->
+  <section id="showcase">
+    <div class="wrap">
+      <div class="section-head center">
+        <div class="eyebrow">See Beacon in action</div>
+        <h2>Not a mockup. This is the actual app.</h2>
+        <p>Every screen below is a real screenshot of the product — no stand-ins.</p>
+      </div>
+      <div class="showcase-scroller">
+        <div class="showcase-item">
+          <div class="phone-frame"><img src="{% static 'screenshots/dashboard.png' %}" alt="Beacon dashboard"></div>
+          <div class="cap">Dashboard</div>
+          <div class="sub">Balance, quick actions and recent activity at a glance.</div>
+        </div>
+        <div class="showcase-item">
+          <div class="phone-frame"><img src="{% static 'screenshots/buy_service.png' %}" alt="Buying data with the PIN keypad open"></div>
+          <div class="cap">Buy a service</div>
+          <div class="sub">A native-feeling PIN pad confirms every purchase — no keyboard, no password.</div>
+        </div>
+        <div class="showcase-item">
+          <div class="phone-frame"><img src="{% static 'screenshots/claim_page.png' %}" alt="A claim link landing page"></div>
+          <div class="cap">Claim links</div>
+          <div class="sub">Whoever opens the link just enters a phone number. That's the whole flow.</div>
+        </div>
+        <div class="showcase-item">
+          <div class="phone-frame"><img src="{% static 'screenshots/family_dashboard.png' %}" alt="Beacon Family dashboard"></div>
+          <div class="cap">Beacon Family</div>
+          <div class="sub">A shared wallet with schedules, requests and role-based permissions.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLAIM LINKS DEEP DIVE -->
+  <section id="claim-links">
+    <div class="wrap deep-dive">
+      <div class="dd-text">
+        <div class="eyebrow">The Beacon difference</div>
+        <h2>Send data to someone who doesn't have Beacon.</h2>
+        <p>No app, no PIN, no account. Just a link and a phone number — the single feature that makes Beacon different from every other VTU app.</p>
+        <div class="dd-points">
+          <div class="dd-point">
+            <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg></div>
+            <div><h4>Buy, then generate a link</h4><p>Pick one slot or several — each becomes a single claim.</p></div>
+          </div>
+          <div class="dd-point">
+            <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg></div>
+            <div><h4>Share it anywhere</h4><p>WhatsApp, SMS, Twitter — the link works wherever text can travel.</p></div>
+          </div>
+          <div class="dd-point">
+            <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div>
+            <div><h4>They confirm a number. Done.</h4><p>No sign-up screen, ever — delivery lands in seconds.</p></div>
+          </div>
+          <div class="dd-point">
+            <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+            <div><h4>You stay in control</h4><p>Set an expiry, watch the usage counter, or disable the link anytime.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="dd-visual">
+        <div class="phone-frame lg"><img src="{% static 'screenshots/claim_page.png' %}" alt="Claim link page showing a gift of 2GB data"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEACON FAMILY DEEP DIVE -->
+  <section id="family">
+    <div class="wrap deep-dive reverse">
+      <div class="dd-visual">
+        <div class="phone-frame lg"><img src="{% static 'screenshots/family_dashboard.png' %}" alt="Beacon Family dashboard showing shared wallet and schedules"></div>
+      </div>
+      <div class="dd-text">
+        <div class="eyebrow">New</div>
+        <h2>Take care of your family automatically.</h2>
+        <p>Share a wallet, set spending limits, and schedule airtime, data and electricity for the people who matter — set it once, Beacon takes care of the rest.</p>
+        <div class="dd-points">
+          <div class="dd-point">
+            <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+            <div><h4>One shared wallet</h4><p>Anyone in the family can top it up — spending stays permissioned.</p></div>
+          </div>
+          <div class="dd-point">
+            <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+            <div><h4>Recurring, automatic payments</h4><p>"Every 1st of the month, buy Mum 10GB." No more remembering.</p></div>
+          </div>
+          <div class="dd-point">
+            <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div>
+            <div><h4>Requests, not free-for-all spending</h4><p>Members can ask; the owner approves — every naira accounted for.</p></div>
+          </div>
+        </div>
+        <div class="role-strip">
+          <div class="role-pill"><span class="d" style="background:#FFB020;"></span>Owner — full control</div>
+          <div class="role-pill"><span class="d" style="background:#7C6CFF;"></span>Admin — manages schedules</div>
+          <div class="role-pill"><span class="d" style="background:#00D9A3;"></span>Member — requests purchases</div>
+          <div class="role-pill"><span class="d" style="background:#6B7098;"></span>Viewer — read-only</div>
         </div>
       </div>
     </div>
@@ -454,7 +406,6 @@
       <div class="section-head">
         <div class="eyebrow">Supported services</div>
         <h2>Every provider people actually use.</h2>
-        <p>Networks, discos, cable and exam bodies — all under one wallet.</p>
       </div>
       <div class="services-block">
         <div class="service-cat">
@@ -467,13 +418,12 @@
           </div>
         </div>
         <div class="service-cat">
-          <div class="cat-label">Electricity (Discos)</div>
+          <div class="cat-label">Electricity</div>
           <div class="chip-row">
             <div class="chip"><span class="swatch" style="background:var(--amber)"></span>Ikeja Electric</div>
             <div class="chip"><span class="swatch" style="background:var(--amber)"></span>Eko Disco</div>
             <div class="chip"><span class="swatch" style="background:var(--amber)"></span>Abuja Disco</div>
             <div class="chip"><span class="swatch" style="background:var(--amber)"></span>Ibadan Disco</div>
-            <div class="chip"><span class="swatch" style="background:var(--amber)"></span>Kano Disco</div>
           </div>
         </div>
         <div class="service-cat">
@@ -483,7 +433,6 @@
             <div class="chip"><span class="swatch" style="background:var(--violet)"></span>GOtv</div>
             <div class="chip"><span class="swatch" style="background:var(--violet)"></span>Startimes</div>
             <div class="chip"><span class="swatch" style="background:var(--violet)"></span>Spectranet</div>
-            <div class="chip"><span class="swatch" style="background:var(--violet)"></span>Smile</div>
           </div>
         </div>
         <div class="service-cat">
@@ -495,46 +444,6 @@
             <div class="chip"><span class="swatch" style="background:var(--mint)"></span>NABTEB</div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CLAIM LINKS -->
-  <section id="claim-links" class="claim-section">
-    <div class="wrap claim-grid">
-      <div>
-        <div class="eyebrow">The Beacon difference</div>
-        <h2 style="font-size:clamp(26px,3.4vw,36px); margin-bottom:16px;">Send data to someone who doesn't have Beacon.</h2>
-        <p style="color:var(--text-dim); margin-bottom:8px;">No app, no PIN, no account. Just a link and a phone number.</p>
-        <div class="steps">
-          <div class="step">
-            <div class="num">1</div>
-            <div><h4>Buy and choose "Generate link"</h4><p>Pick one slot or several — each becomes a single claim on your link.</p></div>
-          </div>
-          <div class="step">
-            <div class="num">2</div>
-            <div><h4>Share it however you like</h4><p>WhatsApp, SMS, Twitter — the link works anywhere text can travel.</p></div>
-          </div>
-          <div class="step">
-            <div class="num">3</div>
-            <div><h4>They enter a number and confirm</h4><p>That's the entire flow. No sign-up screen, ever.</p></div>
-          </div>
-          <div class="step">
-            <div class="num">4</div>
-            <div><h4>You stay in control</h4><p>Set an expiry date, watch the usage counter, or disable the link anytime.</p></div>
-          </div>
-        </div>
-      </div>
-      <div class="phone-mock">
-        <div class="chatline">Hey! Sending you 1GB, just tap this 👇</div>
-        <div class="link-card">
-          <div class="lab">Beacon claim link · 1 of 3 slots left</div>
-          <div class="url">beacon.app/claim/8f3a-2gb</div>
-          <div class="meta"><span>Expires in 2 days</span><span>MTN · 2GB</span></div>
-        </div>
-        <p style="font-size:12.5px; color:var(--text-dimmer); margin-bottom:8px;">Enter the phone number to receive this data:</p>
-        <div class="pin-row"><div>0</div><div>8</div><div>0</div><div>·</div><div>·</div><div>·</div></div>
-        <div class="claim-btn" style="margin-top:16px;">Confirm & claim</div>
       </div>
     </div>
   </section>
@@ -551,12 +460,12 @@
         <div class="price-card">
           <div class="tag">Personal</div>
           <h3>Pay as you go</h3>
-          <p class="sub">For everyday recharges and bill payments.</p>
+          <p class="sub">For everyday recharges, bill payments, and claim links.</p>
           <ul class="price-list">
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Airtime & data at face value</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Free wallet funding by transfer</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Unlimited claim links</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Full transaction history</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> One free family, up to 20 members</li>
           </ul>
           <a href="#" class="btn btn-ghost" style="width:100%;">Create free account</a>
         </div>
@@ -579,10 +488,7 @@
   <!-- WHY -->
   <section>
     <div class="wrap">
-      <div class="section-head">
-        <div class="eyebrow">Why Beacon</div>
-        <h2>Built like infrastructure, not a side project.</h2>
-      </div>
+      <div class="section-head"><div class="eyebrow">Why Beacon</div><h2>Built like infrastructure, not a side project.</h2></div>
       <div class="why-grid">
         <div class="why-item"><div class="big">99.98%</div><p>successful delivery rate across all supported networks</p></div>
         <div class="why-item"><div class="big">&lt;5s</div><p>average time from confirming a purchase to delivery</p></div>
@@ -595,31 +501,19 @@
   <!-- TESTIMONIALS -->
   <section>
     <div class="wrap">
-      <div class="section-head">
-        <div class="eyebrow">From people who use it</div>
-        <h2>Trusted for the small stuff that matters daily.</h2>
-      </div>
+      <div class="section-head"><div class="eyebrow">From people who use it</div><h2>Trusted for the small stuff that matters daily.</h2></div>
       <div class="test-grid">
         <div class="test-card">
           <p class="quote">"I generate a claim link for my mum every month instead of trying to explain another app to her. She just taps and it's done."</p>
-          <div class="test-who">
-            <div class="avatar" style="background:var(--amber);">CO</div>
-            <div><div class="name">Chidinma O.</div><div class="role">Lagos</div></div>
-          </div>
+          <div class="test-who"><div class="avatar" style="background:var(--amber);">CO</div><div><div class="name">Chidinma O.</div><div class="role">Lagos</div></div></div>
         </div>
         <div class="test-card">
-          <p class="quote">"I run a small reselling business on the side. The bulk claim links save me hours every week compared to sending one by one."</p>
-          <div class="test-who">
-            <div class="avatar" style="background:var(--mint);">TB</div>
-            <div><div class="name">Tunde B.</div><div class="role">Ibadan</div></div>
-          </div>
+          <p class="quote">"Beacon Family replaced a group chat full of 'send me credit' messages. Everyone has their limit, I approve requests from my phone."</p>
+          <div class="test-who"><div class="avatar" style="background:var(--violet);">MI</div><div><div class="name">Musa I.</div><div class="role">Kano</div></div></div>
         </div>
         <div class="test-card">
-          <p class="quote">"The password step on every purchase sounds slow but it isn't — and I've never once worried about a mistaken top-up."</p>
-          <div class="test-who">
-            <div class="avatar" style="background:var(--violet);">AF</div>
-            <div><div class="name">Amaka F.</div><div class="role">Abuja</div></div>
-          </div>
+          <p class="quote">"The PIN pad sounds like a small thing until you're topping up in a crowded bus and don't want your password on screen."</p>
+          <div class="test-who"><div class="avatar" style="background:var(--mint);">AF</div><div><div class="name">Amaka F.</div><div class="role">Abuja</div></div></div>
         </div>
       </div>
     </div>
@@ -628,30 +522,27 @@
   <!-- FAQ -->
   <section id="faq">
     <div class="wrap">
-      <div class="section-head">
-        <div class="eyebrow">Questions</div>
-        <h2>Everything before you start.</h2>
-      </div>
+      <div class="section-head"><div class="eyebrow">Questions</div><h2>Everything before you start.</h2></div>
       <div class="faq-list">
         <div class="faq-item open">
-          <button class="faq-q">Does the person receiving a claim link need a Beacon account? <span class="plus">+</span></button>
-          <div class="faq-a"><p>No. They only enter the phone number that should receive the airtime or data, then confirm. No sign-up, PIN, or app download involved.</p></div>
+          <button class="faq-q">Does someone receiving a claim link need a Beacon account? <span class="plus">+</span></button>
+          <div class="faq-a"><p>No. They enter the phone number that should receive the airtime or data, then confirm. No sign-up, PIN, or app download involved.</p></div>
         </div>
         <div class="faq-item">
-          <button class="faq-q">What happens when a claim link runs out of slots? <span class="plus">+</span></button>
-          <div class="faq-a"><p>The link shows "This link has expired" to anyone who opens it afterward. You can also disable a link manually at any point before that.</p></div>
+          <button class="faq-q">How is Beacon Family different from just sharing my login? <span class="plus">+</span></button>
+          <div class="faq-a"><p>Sharing a login gives everyone full access to your wallet. Beacon Family gives each person their own role, their own spending limit, and a request/approval flow — you see exactly who spent what.</p></div>
         </div>
         <div class="faq-item">
-          <button class="faq-q">How do I fund my wallet? <span class="plus">+</span></button>
-          <div class="faq-a"><p>By bank transfer to a dedicated account reference. Once the transfer is confirmed, your wallet balance updates and you can spend it on any supported service.</p></div>
+          <button class="faq-q">What happens if a scheduled family payment can't be covered? <span class="plus">+</span></button>
+          <div class="faq-a"><p>Beacon skips that cycle, logs it as failed in the activity feed, and tries again next cycle — nobody's line gets cut off silently, and the owner can top up and it'll catch up.</p></div>
         </div>
         <div class="faq-item">
-          <button class="faq-q">Is every purchase password-protected? <span class="plus">+</span></button>
-          <div class="faq-a"><p>Yes. Every purchase, whether airtime, data, electricity, or cable, asks you to confirm with your account password before it's processed.</p></div>
+          <button class="faq-q">Is every purchase PIN-protected? <span class="plus">+</span></button>
+          <div class="faq-a"><p>Yes. Every purchase — airtime, data, electricity, cable, or a family schedule approval — is confirmed with a numeric PIN entered through an on-screen keypad, never your device's default keyboard.</p></div>
         </div>
         <div class="faq-item">
           <button class="faq-q">Can I see exactly where my money went? <span class="plus">+</span></button>
-          <div class="faq-a"><p>Every transaction records the amount, wallet balance before and after, service, recipient, and a reference number — filterable by date, status, or service.</p></div>
+          <div class="faq-a"><p>Every transaction records the amount, balance before and after, service, recipient, and reference — filterable by date, status, or service, for both personal and family wallets.</p></div>
         </div>
       </div>
     </div>
@@ -674,43 +565,27 @@
   <div class="wrap">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a href="#top" class="logo">
-          <span class="bars"><span></span><span></span><span></span><span></span></span>
-          Beacon
-        </a>
-        <p>A single wallet for airtime, data, electricity, cable and exam pins — with links that let anyone claim, no account needed.</p>
-        <div class="social-row">
-          <a href="#" aria-label="Twitter">𝕏</a>
-          <a href="#" aria-label="Instagram">◎</a>
-          <a href="#" aria-label="WhatsApp">◐</a>
-        </div>
+        <a href="#top" class="logo"><span class="bars"><span></span><span></span><span></span><span></span></span>Beacon</a>
+        <p>One wallet for airtime, data, electricity, cable and exam pins — with claim links anyone can redeem, and family automation that runs itself.</p>
+        <div class="social-row"><a href="#">𝕏</a><a href="#">◎</a><a href="#">◐</a></div>
       </div>
-      <div>
-        <h4>Product</h4>
-        <ul>
-          <li><a href="#services">Services</a></li>
-          <li><a href="#claim-links">Claim links</a></li>
-          <li><a href="#pricing">Pricing</a></li>
-          <li><a href="#">Reseller program</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Company</h4>
-        <ul>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Support</a></li>
-          <li><a href="#faq">FAQ</a></li>
-          <li><a href="#">Status</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Legal</h4>
-        <ul>
-          <li><a href="#">Terms of service</a></li>
-          <li><a href="#">Privacy policy</a></li>
-          <li><a href="#">Refund policy</a></li>
-        </ul>
-      </div>
+      <div><h4>Product</h4><ul>
+        <li><a href="#showcase">Product tour</a></li>
+        <li><a href="#claim-links">Claim links</a></li>
+        <li><a href="#family">Beacon Family</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul></div>
+      <div><h4>Company</h4><ul>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Support</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#">Status</a></li>
+      </ul></div>
+      <div><h4>Legal</h4><ul>
+        <li><a href="#">Terms of service</a></li>
+        <li><a href="#">Privacy policy</a></li>
+        <li><a href="#">Refund policy</a></li>
+      </ul></div>
     </div>
     <div class="footer-bottom">
       <span>© 2026 Beacon. All rights reserved.</span>
@@ -720,8 +595,6 @@
 </footer>
 
 <script>
-
-  // FAQ accordion
   document.querySelectorAll('.faq-item').forEach(item => {
     const q = item.querySelector('.faq-q');
     const a = item.querySelector('.faq-a');
@@ -729,16 +602,12 @@
     q.addEventListener('click', () => {
       const isOpen = item.classList.contains('open');
       document.querySelectorAll('.faq-item.open').forEach(other => {
-        if(other !== item){
-          other.classList.remove('open');
-          other.querySelector('.faq-a').style.maxHeight = null;
-        }
+        if(other !== item){ other.classList.remove('open'); other.querySelector('.faq-a').style.maxHeight = null; }
       });
       item.classList.toggle('open');
       a.style.maxHeight = isOpen ? null : a.scrollHeight + 'px';
     });
   });
-  
 </script>
 
 </body>

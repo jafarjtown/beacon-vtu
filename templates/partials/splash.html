@@ -9,7 +9,11 @@
     position:fixed; inset:0; z-index:9999;
     background:#0B0E1F;
     display:flex; align-items:center; justify-content:center;
+    flex-direction: column;
     transition:opacity .35s ease, visibility .35s ease;
+  }
+  .beacon-splash p{
+    color: var(--text);
   }
   .beacon-splash.beacon-splash-hidden{
     opacity:0; visibility:hidden; pointer-events:none;

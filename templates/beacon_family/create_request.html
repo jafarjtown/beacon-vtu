@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Request a purchase{% endblock %}
+{% block page_title %}Request a purchase{% endblock %}
+{% block page_subtitle %}<p>{{ family.name }} — sent to the family owner for approval.</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/family.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="narrow-shell">
+  <div class="buy-card">
+    {% if presets %}
+    <h3>What do you need?</h3>
+    <p class="hint">Uses one of your own saved services.</p>
+
+    <form method="post" action="{% url 'beacon_family:create_request' family_id=family.id %}">
+      {% csrf_token %}
+
+      <div class="form-group" id="id_preset_wrappper">
+        <label for="id_preset">Service</label>
+        <select name="preset" id="id_preset" class="form-select">
+          {% for preset in presets %}
+            <option data-category="{{ preset.provider.category }}" data-api_id="{{ preset.provider.api_id }}" value="{{ preset.id }}">{{ preset.label }} — {{ preset.get_service_type_display }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group" id="id_data_wrapper">
+        <label for="id_service_plan">Data plan</label>
+        <select name="service_plan" id="id_service_plan" class="form-select">
+          <option>Select Plan</option>
+          
+        </select>
+      </div>
+
+
+      <div class="form-group" id="id_amount_wrapper">
+        <label for="id_amount">Amount</label>
+        <input type="number" step="0.01" name="amount" id="id_amount" class="form-input" placeholder="e.g. 1000" min="1" required>
+      </div>
+
+      <div class="form-group">
+        <label for="id_note">Note (optional)</label>
+        <input type="text" name="note" id="id_note" class="form-input" placeholder="e.g. Need this before Friday" maxlength="255">
+      </div>
+
+      <button startLoading type="submit" class="btn btn-primary btn-block">Send request →</button>
+    </form>
+
+    {% else %}
+    <div class="empty-state" style="border:none; padding:20px 0;">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+      <h3>No saved services yet</h3>
+      <p>Add your own saved service first, then come back to request from it.</p>
+      <a href="{% url 'beacon_family:create_preset' family_id=family.id %}" class="btn btn-primary">Add a saved service</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
+{% block extra_scripts %}
+<script>
+  document.querySelector("#id_preset").addEventListener("change", (e) => {
+    const selected = e.target.selectedOptions[0];
+
+    updateAmountDisply(selected.dataset.category);
+});
+updateAmountDisply(document.querySelector("#id_preset").selectedOptions[0].dataset.category)
+function updateAmountDisply(category) {
+  let amount_input_wr = document.querySelector("#id_amount_wrapper")
+  let data_input_wr = document.querySelector("#id_data_wrapper")
+  amount_input_wr.hidden = category == 'data' || category == ''
+  data_input_wr.hidden = !(category == 'data' || category == '')
+  amount_input_wr.querySelector("input").required = !(category == 'data' || category == '')
+}
+
+
+
+  document.querySelector('#id_preset').addEventListener('change', i => {
+    let selectedOpt = i.target.selectedOptions[0]
+    let providerId = selectedOpt.dataset.api_id
+    updateDataPlan(providerId)
+  });
+  
+  
+  async function updateDataPlan(providerId) {
+    if(providerId == "Select Network") return
+    let selectEle = document.getElementById("id_service_plan")
+    selectEle.innerHTML = "<option>Loading plans</option>"
+    let request = await fetch(`{% url 'api-data-plans' %}?serviceID=${providerId}`)
+    let response = await request.json()
+    if(request.ok) {
+      selectEle.innerHTML = "<option>Select plan</option>"
+      response["variations"].forEach(variation => {
+        let option = document.createElement("option")
+        option.value = variation["variation_code"]
+        option.textContent = variation["name"]
+        option.className = "data-option"
+
+        option.setAttribute("data-amount", variation["variation_amount"])
+        
+        selectEle.appendChild(option)
+        })
+      }
+    }
+
+  updateSeriveProvider('airtime')
+</script>
+{% endblock extra_scripts %}

@@ -106,7 +106,7 @@
   </div>
   <form method="post" action="{% url 'links:disable' link.link_id %}">
     {% csrf_token %}
-    <button type="submit" class="btn btn-danger" {% if link.status != 'active' %}disabled{% endif %}>Disable link</button>
+    <button startLoading type="submit" class="btn btn-danger" {% if link.status != 'active' %}disabled{% endif %}>Disable link</button>
   </form>
 </div>
 

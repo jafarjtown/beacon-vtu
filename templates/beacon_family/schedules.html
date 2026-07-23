@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Schedules{% endblock %}
+{% block page_title %}Schedules{% endblock %}
+{% block page_subtitle %}<p>{{ family.name }} — recurring purchases Beacon handles automatically.</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/family.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+  {% if membership.can_create_schedule %}
+  <a href="{% url 'beacon_family:create_schedule' family_id=family.id %}" class="btn btn-primary">+ New schedule</a>
+  {% endif %}
+</div>
+
+{% if schedules %}
+  {% for schedule in schedules %}
+  <div class="schedule-card {% if not schedule.is_active %}paused{% endif %}">
+    <div class="schedule-main">
+      <div class="nm">{{ schedule.preset.label }} — {{ schedule.beneficiary.user }}</div>
+      <div class="sub">₦{{ schedule.amount }} · {{ schedule.get_frequency_display }}{% if not schedule.is_active %} · Paused{% endif %}</div>
+    </div>
+    <span class="freq-badge">{{ schedule.get_frequency_display }}</span>
+    <div class="schedule-next">
+      {% if schedule.is_active %}Next<br><span class="d">{{ schedule.next_run_at|date:"d M" }}</span>{% else %}—{% endif %}
+    </div>
+    {% if membership.can_create_schedule %}
+    <form method="post" action="{% url 'beacon_family:toggle_schedule' family_id=family.id schedule_id=schedule.id %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-ghost btn-sm-inline">{% if schedule.is_active %}Pause{% else %}Resume{% endif %}</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endfor %}
+{% else %}
+<div class="empty-state">
+  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+  <h3>No schedules yet</h3>
+  <p>"Every 1st of the month, buy Mum 10GB of MTN data" — set it once, Beacon takes it from there.</p>
+  {% if membership.can_create_schedule %}
+    <a href="{% url 'beacon_family:create_schedule' family_id=family.id %}" class="btn btn-primary">Create your first schedule</a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

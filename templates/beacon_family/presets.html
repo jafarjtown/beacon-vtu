@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Saved services{% endblock %}
+{% block page_title %}Saved services{% endblock %}
+{% block page_subtitle %}<p>{{ family.name }} — the details schedules and requests use.</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/family.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+  <a href="{% url 'beacon_family:create_preset' family_id=family.id %}" class="btn btn-primary">+ Add service</a>
+</div>
+
+{% if presets %}
+<div style="display:flex; flex-direction:column; gap:12px;">
+  {% for preset in presets %}
+  <div class="preset-card">
+    <div class="preset-icon">
+      {% if preset.service_type == 'data' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20a8 8 0 100-16 8 8 0 000 16z"/><path d="M12 16a4 4 0 100-8 4 4 0 000 8z"/></svg>
+      {% elif preset.service_type == 'electricity' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>
+      {% elif preset.service_type == 'cable' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M9 3l3 4 3-4"/></svg>
+      {% else %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+      {% endif %}
+    </div>
+    <div class="preset-info">
+      <div class="nm">{{ preset.label }}</div>
+      <div class="sub">{{ preset.get_service_type_display }} · {{ preset.recipient_identifier }}</div>
+      <div class="owner">For {{ preset.membership.user }}</div>
+      {% if preset.service_type == "data" %}
+      <div class="divider"></div>
+      <div>
+        <span class="nm">Plan</span>
+        <p class="sub">
+            {{ preset.plan.name }}
+        </p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+  <h3>No saved services yet</h3>
+  <p>Save each family member's usual network and number so schedules and requests don't need it re-entered.</p>
+  <a href="{% url 'beacon_family:create_preset' family_id=family.id %}" class="btn btn-primary">Add the first one</a>
+</div>
+{% endif %}
+
+{% endblock %}

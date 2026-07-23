@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Beacon Family{% endblock %}
+{% block page_title %}Beacon Family{% endblock %}
+{% block page_subtitle %}<p>Share a wallet, set limits, and automate payments for the people who matter.</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/family.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{% for membership in pending_invites %}
+<div class="invite-banner">
+  <div class="it-text">
+    You've been invited to join <b>{{ membership.family.name }}</b>
+    <div class="it-sub">as {{ membership.get_role_display }}</div>
+  </div>
+  <form method="post" action="{% url 'beacon_family:accept_invite' membership_id=membership.id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Accept invite</button>
+  </form>
+</div>
+{% endfor %}
+
+<div class="section-title">
+  <h2>Your families</h2>
+  <a href="{% url 'beacon_family:create' %}">+ Create family</a>
+</div>
+
+{% if active_memberships %}
+<div class="family-grid">
+  {% for membership in active_memberships %}
+  <a href="{% url 'beacon_family:dashboard' family_id=membership.family.id %}" class="family-card" style="display:block; text-decoration:none;">
+    <div class="family-card-top">
+      <div>
+        <h3>{{ membership.family.name }}</h3>
+        <div class="sub">You're the {{ membership.get_role_display }}</div>
+      </div>
+      <span class="role-chip role-{{ membership.role }}">{{ membership.get_role_display }}</span>
+    </div>
+    <div class="family-card-stats">
+      <div class="stat">
+        <span class="val">₦{{ membership.family.wallet.balance|default:"0.00" }}</span>
+        <span class="lab">Wallet balance</span>
+      </div>
+      <div class="stat">
+        <span class="val">{{ membership.family.active_members.count }}</span>
+        <span class="lab">Members</span>
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+  <h3>No families yet</h3>
+  <p>Create one to share a wallet and automate payments for the people you support.</p>
+  <a href="{% url 'beacon_family:create' %}" class="btn btn-primary">Create your first family</a>
+</div>
+{% endif %}
+
+{% endblock %}

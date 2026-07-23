@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Invite a member{% endblock %}
+{% block page_title %}Invite a member{% endblock %}
+{% block page_subtitle %}<p>{{ family.name }}</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/family.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="narrow-shell">
+  <div class="buy-card">
+    <h3>Who are you inviting?</h3>
+    <p class="hint">They'll need an existing Beacon account with this email address.</p>
+
+    <form method="post" action="{% url 'beacon_family:invite_member' family_id=family.id %}">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="id_email">Email address</label>
+        <input type="email" name="email" id="id_email" class="form-input" placeholder="mum@example.com" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label>Role</label>
+        <div class="member-select-row">
+          <label class="member-select-chip"><input type="radio" name="role" value="member" checked>Member</label>
+          <label class="member-select-chip"><input type="radio" name="role" value="admin">Admin</label>
+          <label class="member-select-chip"><input type="radio" name="role" value="viewer">Viewer</label>
+        </div>
+      </div>
+
+      <button startLoading type="submit" class="btn btn-primary btn-block">Send invite →</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

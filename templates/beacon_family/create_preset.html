@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Add a saved service{% endblock %}
+{% block page_title %}Add a saved service{% endblock %}
+{% block page_subtitle %}<p>{{ family.name }}</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/family.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="narrow-shell">
+  <div class="buy-card">
+    <h3>Whose service is this?</h3>
+    <p class="hint">Set this up for yourself, or on behalf of another member.</p>
+
+    <form method="post" action="{% url 'beacon_family:create_preset' family_id=family.id %}">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label>Member</label>
+        <div class="member-select-row">
+          {% for m in members %}
+          <label class="member-select-chip">
+            <input type="radio" name="membership_id" value="{{ m.id }}" {% if forloop.first %}checked{% endif %}>
+            {{ m.user }}
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="id_service_type">Service type</label>
+        <select name="service_type" id="id_service_type" class="form-select">
+          <option value="airtime" selected>Airtime</option>
+          <option value="data">Data</option>
+          <option value="electricity">Electricity</option>
+          <option value="cable">Cable TV</option>
+          <option value="internet">Internet</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="id_service_provider">Network</label>
+        <select name="service_provider" id="id_service_provider" class="form-select">
+          <option>Select Network</option>
+          {% for provider in providers %}
+            <option data-category="{{ provider.category }}" value="{{ provider.api_id }}">{{ provider.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="id_label">Label</label>
+        <input type="text" name="label" id="id_label" class="form-input" placeholder="e.g. Mum's MTN line" required>
+      </div>
+
+      <div class="form-group">
+        <label for="id_recipient">Phone / meter / smartcard number</label>
+        <input type="text" name="recipient_identifier" id="id_recipient" class="form-input" placeholder="e.g. 0803 123 4567" required>
+      </div>
+
+      <button startLoading type="submit" class="btn btn-primary btn-block">Save service →</button>
+    </form>
+  </div>
+</div>
+
+
+{% endblock %}
+{% block extra_scripts %}
+<script>
+  let serviceType = document.querySelector("#id_service_type")
+
+  serviceType.addEventListener("change", ()=>{
+    let selectedOpt = serviceType.value
+    updateSeriveProvider(selectedOpt)
+    
+  })
+
+  function updateSeriveProvider(service_type) {
+    let serviceProvider = document.querySelector("#id_service_provider")
+
+    let options = serviceProvider.querySelectorAll('option:nth-child(n+2)');
+    
+    options.forEach(opt => {
+      opt.hidden = !opt.dataset.category.includes(service_type);
+    });
+
+  }
+</script>
+{% endblock extra_scripts %}

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block title %}{{ family.name }}{% endblock %}
+{% block page_title %}{{ family.name }}{% endblock %}
+{% block page_subtitle %}<p>You're the {{ membership.get_role_display }} · {{ member_count }} member{{ member_count|pluralize }}</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/family.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="dash-grid">
+  <div class="balance-card">
+    <div class="label">Family wallet balance</div>
+    <div class="amount">₦{{ wallet.balance|intcomma }}</div>
+    <div class="balance-actions">
+      {% if membership.can_fund_wallet %}
+        <a href="{% url 'beacon_family:fund_wallet' family_id=family.id %}" class="btn btn-primary">Fund wallet</a>
+      {% endif %}
+      <a href="{% url 'beacon_family:members' family_id=family.id %}" class="btn btn-ghost">Members</a>
+    </div>
+  </div>
+
+  <div class="stat-mini-grid">
+    <div class="stat-mini">
+      <div class="top"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div></div>
+      <div class="val">{{ member_count }}</div>
+      <div class="lab">Active members</div>
+    </div>
+    <div class="stat-mini">
+      <div class="top"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div></div>
+      <div class="val">{{ upcoming_schedules|length }}</div>
+      <div class="lab">Active schedules</div>
+    </div>
+    <div class="stat-mini">
+      <div class="top"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div></div>
+      <div class="val">{{ pending_requests|length }}</div>
+      <div class="lab">Pending requests</div>
+    </div>
+    <div class="stat-mini">
+      <div class="top"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg></div></div>
+      <div class="val">₦{{ wallet.total_spent|intcomma }}</div>
+      <div class="lab">Total spent</div>
+    </div>
+  </div>
+</div>
+
+<div class="quick-actions">
+  <div class="section-title"><h2>Quick actions</h2></div>
+  <div class="qa-grid">
+    {% if membership.can_fund_wallet %}
+    <a href="{% url 'beacon_family:fund_wallet' family_id=family.id %}" class="qa-item">
+      <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+      <span>Fund wallet</span>
+    </a>
+    {% endif %}
+    {% if membership.can_add_members %}
+    <a href="{% url 'beacon_family:invite_member' family_id=family.id %}" class="qa-item">
+      <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></div>
+      <span>Invite member</span>
+    </a>
+    {% endif %}
+    {% if membership.can_create_schedule %}
+    <a href="{% url 'beacon_family:create_schedule' family_id=family.id %}" class="qa-item">
+      <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+      <span>New schedule</span>
+    </a>
+    {% endif %}
+    {% if membership.can_request_purchase %}
+    <a href="{% url 'beacon_family:create_request' family_id=family.id %}" class="qa-item">
+      <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg></div>
+      <span>Request purchase</span>
+    </a>
+    {% endif %}
+    <a href="{% url 'beacon_family:presets' family_id=family.id %}" class="qa-item">
+      <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+      <span>Saved services</span>
+    </a>
+    <a href="{% url 'beacon_family:schedules' family_id=family.id %}" class="qa-item">
+      <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg></div>
+      <span>All schedules</span>
+    </a>
+  </div>
+</div>
+
+{% if membership.can_approve_requests and pending_requests %}
+<div class="quick-actions">
+  <div class="section-title">
+    <h2>Awaiting your approval</h2>
+    <a href="{% url 'beacon_family:requests' family_id=family.id %}">View all →</a>
+  </div>
+  {% for req in pending_requests %}
+  <div class="request-card">
+    <div class="request-top">
+      <div>
+        <div class="request-who">{{ req.requested_by.user }}</div>
+        <div class="request-what">{{ req.preset.label }} · ₦{{ req.amount }}</div>
+      </div>
+      <div class="request-amount">₦{{ req.amount }}</div>
+    </div>
+    <div class="request-actions">
+      <form method="post" action="{% url 'beacon_family:approve_request' family_id=family.id request_id=req.id %}">
+        {% csrf_token %}
+        <button startLoading type="submit" class="btn btn-primary btn-block">Approve</button>
+      </form>
+      <form method="post" action="{% url 'beacon_family:reject_request' family_id=family.id request_id=req.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-ghost btn-block">Reject</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="quick-actions">
+  <div class="section-title">
+    <h2>Upcoming</h2>
+    <a href="{% url 'beacon_family:schedules' family_id=family.id %}">View all →</a>
+  </div>
+  {% if upcoming_schedules %}
+    {% for schedule in upcoming_schedules %}
+    <div class="schedule-card">
+      <div class="schedule-main">
+        <div class="nm">{{ schedule.preset.label }} — {{ schedule.beneficiary.user }}</div>
+        <div class="sub">₦{{ schedule.amount }} · {{ schedule.get_frequency_display }}</div>
+      </div>
+      <span class="freq-badge">{{ schedule.get_frequency_display }}</span>
+      <div class="schedule-next">Next<br><span class="d">{{ schedule.next_run_at|date:"d M" }}</span></div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+      <h3>No schedules yet</h3>
+      <p>Set one up once, and Beacon handles the rest every cycle.</p>
+    </div>
+  {% endif %}
+</div>
+
+<div class="quick-actions">
+  <div class="section-title"><h2>Recent activity</h2></div>
+  <div class="tx-table">
+    <div class="tx-row head">
+      <div></div>
+      <div>Description</div>
+      <div class="col-status">Status</div>
+      <div>Amount</div>
+    </div>
+    {% for run in recent_runs %}
+    <div class="tx-row">
+      <div class="tx-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>
+      </div>
+      <div class="tx-desc">
+        <div class="t1">{{ run.schedule.preset.label }} — {{ run.schedule.beneficiary.user }}</div>
+        <div class="t2">{{ run.ran_at|date:"d M, g:i A" }}</div>
+      </div>
+      <div class="col-status">
+        <span class="badge badge-{% if run.status == 'success' %}success{% else %}failed{% endif %}">{{ run.get_status_display }}</span>
+      </div>
+      <div class="tx-amount neg">−₦{{ run.amount }}</div>
+    </div>
+    {% empty %}
+    <div class="tx-row">
+      <div></div>
+      <div class="tx-desc"><div class="t1" style="color:var(--text-dimmer);">Nothing yet — activity from schedules and approved requests will show up here.</div></div>
+      <div class="col-status"></div>
+      <div></div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

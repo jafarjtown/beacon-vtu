@@ -50,7 +50,7 @@
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Update password</button>
+    <button startLoading type="submit" class="btn btn-primary">Update password</button>
   </form>
 </div>
 
@@ -80,7 +80,7 @@
       <label class="switch"><input type="checkbox" name="notify_marketing"><span class="slider"></span></label>
     </div>
 
-    <button type="submit" class="btn btn-ghost" style="margin-top:20px;">Save preferences</button>
+    <button startLoading type="submit" class="btn btn-ghost" style="margin-top:20px;">Save preferences</button>
   </form>
 </div>
 
@@ -179,7 +179,7 @@
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">
+    <button startLoading type="submit" class="btn btn-primary">
       {% if request.user.transaction_pin_hash %}
         Update PIN
       {% else %}
@@ -199,7 +199,7 @@
       <h4>Deactivate account</h4>
       <p>Temporarily disable your account. You can log back in anytime to reactivate it.</p>
     </div>
-    <button type="button" class="btn btn-ghost" id="deactivateBtn">Deactivate</button>
+    <button startLoading type="button" class="btn btn-ghost" id="deactivateBtn">Deactivate</button>
   </div>
 
   <div class="danger-row">
@@ -207,7 +207,7 @@
       <h4>Delete account</h4>
       <p>Permanently delete your account and wallet history. This can't be undone.</p>
     </div>
-    <button type="button" class="btn btn-danger" id="deleteBtn">Delete account</button>
+    <button startLoading type="button" class="btn btn-danger" id="deleteBtn">Delete account</button>
   </div>
 </div>
 

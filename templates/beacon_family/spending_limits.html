@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Spending limits{% endblock %}
+{% block page_title %}Spending limits{% endblock %}
+{% block page_subtitle %}<p>For {{ target.user }} in {{ family.name }}</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/family.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="narrow-shell">
+  <div class="buy-card">
+    <h3>Set caps on family wallet spending</h3>
+    <p class="hint">Leave a field blank to leave that period unrestricted.</p>
+
+    <form method="post" action="{% url 'beacon_family:spending_limits' family_id=family.id membership_id=target.id %}">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="id_daily">Daily limit</label>
+        <input type="number" step="0.01" name="daily_limit" id="id_daily" class="form-input" placeholder="No daily limit" value="{{ target.spending_limit.daily_limit|default_if_none:'' }}">
+      </div>
+      <div class="form-group">
+        <label for="id_weekly">Weekly limit</label>
+        <input type="number" step="0.01" name="weekly_limit" id="id_weekly" class="form-input" placeholder="No weekly limit" value="{{ target.spending_limit.weekly_limit|default_if_none:'' }}">
+      </div>
+      <div class="form-group">
+        <label for="id_monthly">Monthly limit</label>
+        <input type="number" step="0.01" name="monthly_limit" id="id_monthly" class="form-input" placeholder="No monthly limit" value="{{ target.spending_limit.monthly_limit|default_if_none:'' }}">
+      </div>
+
+      <button startLoading type="submit" class="btn btn-primary btn-block">Save limits →</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

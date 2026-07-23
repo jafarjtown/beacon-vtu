@@ -1,0 +1,152 @@
+:root{
+  --bg:#0B0E1F; --bg-elev:#12162E; --bg-elev-2:#171C38;
+  --text:#F3F1EA; --text-dim:#9CA1C4; --text-dimmer:#6B7098;
+  --amber:#FFB020; --mint:#00D9A3; --violet:#7C6CFF; --danger:#FF6B6B;
+  --border:rgba(255,255,255,0.08); --border-strong:rgba(255,255,255,0.14);
+}
+
+/* Role colors kept identical to admin.py's ROLE_COLORS so the same
+   role reads the same way whether you're looking at the admin or the
+   app itself. */
+.role-chip{ font-size:11px; font-family:'IBM Plex Mono'; padding:4px 10px; border-radius:999px; font-weight:600; white-space:nowrap; }
+.role-owner{ background:rgba(255,176,32,0.12); color:var(--amber); }
+.role-admin{ background:rgba(124,108,255,0.12); color:var(--violet); }
+.role-member{ background:rgba(0,217,163,0.12); color:var(--mint); }
+.role-viewer{ background:rgba(107,112,152,0.16); color:var(--text-dimmer); }
+
+/* Centered single-card layout for simple forms (create family, invite,
+   fund, etc). Self-contained here rather than reusing wallet.css's
+   .narrow-shell — family templates only load family.css, and cross-file
+   class dependencies are exactly what caused the url-tag mismatches
+   earlier in this project. */
+.narrow-shell{ max-width:460px; margin:0 auto; }
+.btn-sm-inline{ padding:9px 16px; font-size:13px; width:auto; }
+.field-hint{ color:var(--text-dimmer); font-size:12px; margin-top:6px; }
+
+.status-chip{ font-size:11px; font-family:'IBM Plex Mono'; padding:4px 10px; border-radius:999px; font-weight:600; }
+.status-invited{ background:rgba(255,176,32,0.12); color:var(--amber); }
+.status-active{ background:rgba(0,217,163,0.12); color:var(--mint); }
+
+/* ---------- Family list (landing page) ---------- */
+.family-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+@media(max-width:760px){ .family-grid{ grid-template-columns:1fr; } }
+
+.family-card{
+  background:var(--bg-elev); border:1px solid var(--border); border-radius:16px; padding:22px;
+  transition:border-color .2s, transform .2s;
+}
+.family-card:hover{ border-color:var(--border-strong); transform:translateY(-2px); }
+.family-card-top{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px; }
+.family-card h3{ font-size:16.5px; margin-bottom:4px; }
+.family-card .sub{ font-size:12.5px; color:var(--text-dimmer); }
+.family-card-stats{ display:flex; gap:22px; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); }
+.family-card-stats .stat{ display:flex; flex-direction:column; gap:2px; }
+.family-card-stats .stat .val{ font-family:'Space Grotesk'; font-size:16px; }
+.family-card-stats .stat .lab{ font-size:11px; color:var(--text-dimmer); }
+
+.invite-banner{
+  display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  background:linear-gradient(150deg, rgba(255,176,32,0.1), var(--bg-elev));
+  border:1px solid rgba(255,176,32,0.3); border-radius:14px; padding:18px 20px; margin-bottom:14px;
+}
+.invite-banner .it-text{ font-size:14px; }
+.invite-banner .it-text b{ font-weight:600; }
+.invite-banner .it-sub{ font-size:12.5px; color:var(--text-dim); margin-top:2px; }
+.invite-banner form{ display:flex; gap:10px; flex-shrink:0; }
+
+/* ---------- Members ---------- */
+.member-row{
+  display:flex; align-items:center; gap:14px; padding:16px 20px; border-bottom:1px solid var(--border);
+  flex-wrap:wrap;
+}
+.member-row:last-child{ border-bottom:none; }
+.member-avatar{
+  width:40px; height:40px; border-radius:50%; background:var(--bg-elev-2); border:1px solid var(--border-strong);
+  display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:var(--text-dim);
+  flex-shrink:0; text-transform:uppercase;
+}
+.member-info{ flex:1; min-width:140px; }
+.member-info .nm{ font-size:14.5px; font-weight:600; }
+.member-info .em{ font-size:12.5px; color:var(--text-dimmer); }
+.member-badges{ display:flex; gap:8px; align-items:center; flex-shrink:0; }
+.member-actions{ display:flex; gap:8px; flex-shrink:0; }
+.member-list{ background:var(--bg-elev); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+
+/* ---------- Presets ---------- */
+.preset-card{
+  background:var(--bg-elev); border:1px solid var(--border); border-radius:14px; padding:18px;
+  display:flex; align-items:center; gap:14px;
+}
+.preset-icon{
+  width:38px; height:38px; border-radius:10px; background:rgba(255,176,32,0.1); color:var(--amber);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.preset-icon svg{ width:18px; height:18px; }
+.preset-info{ flex:1; min-width:0; }
+.preset-info .nm{ font-size:14px; font-weight:600; }
+.preset-info .sub{ font-size:12px; color:var(--text-dimmer); font-family:'IBM Plex Mono'; margin-top:2px; }
+.preset-info .owner{ font-size:11.5px; color:var(--text-dim); margin-top:2px; }
+
+/* ---------- Schedules ---------- */
+.schedule-card{
+  background:var(--bg-elev); border:1px solid var(--border); border-radius:14px; padding:18px 20px;
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:12px;
+}
+.schedule-card.paused{ opacity:.55; }
+.schedule-main{ flex:1; min-width:200px; }
+.schedule-main .nm{ font-size:14.5px; font-weight:600; margin-bottom:3px; }
+.schedule-main .sub{ font-size:12.5px; color:var(--text-dim); }
+.freq-badge{
+  font-size:11px; font-family:'IBM Plex Mono'; padding:4px 10px; border-radius:999px;
+  background:var(--bg-elev-2); border:1px solid var(--border-strong); color:var(--text-dim); white-space:nowrap;
+}
+.schedule-next{ font-size:12px; color:var(--text-dimmer); text-align:right; flex-shrink:0; }
+.schedule-next .d{ color:var(--mint); font-weight:600; }
+
+/* ---------- Requests ---------- */
+.request-card{
+  background:var(--bg-elev); border:1px solid var(--border); border-radius:14px; padding:18px 20px; margin-bottom:12px;
+}
+.request-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:10px; }
+.request-who{ font-size:14.5px; font-weight:600; }
+.request-what{ font-size:13px; color:var(--text-dim); margin-top:2px; }
+.request-amount{ font-family:'Space Grotesk'; font-size:18px; color:var(--amber); flex-shrink:0; }
+.request-note{ font-size:12.5px; color:var(--text-dim); background:var(--bg-elev-2); border-radius:8px; padding:10px 12px; margin-bottom:12px; }
+.request-actions{ display:flex; gap:10px; }
+.request-actions form{ flex:1; }
+.request-meta{ font-size:11.5px; color:var(--text-dimmer); margin-top:10px; }
+
+/* ---------- Spending limit bars ---------- */
+.limit-row{ margin-bottom:18px; }
+.limit-row:last-child{ margin-bottom:0; }
+.limit-row-top{ display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px; }
+.limit-row-top .lab{ color:var(--text-dim); }
+.limit-row-top .val{ font-family:'IBM Plex Mono'; }
+.limit-bar-track{ height:8px; border-radius:999px; background:var(--bg-elev-2); overflow:hidden; }
+.limit-bar-fill{ height:100%; background:linear-gradient(90deg, var(--mint), var(--amber)); border-radius:999px; }
+.limit-bar-fill.over{ background:var(--danger); }
+
+/* ---------- Shared bits ---------- */
+.empty-state{
+  text-align:center; padding:60px 24px; background:var(--bg-elev); border:1px dashed var(--border-strong); border-radius:18px;
+}
+.empty-state .ic{ width:52px; height:52px; border-radius:14px; background:var(--bg-elev-2); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:var(--text-dimmer); }
+.empty-state .ic svg{ width:24px; height:24px; }
+.empty-state h3{ font-size:16px; margin-bottom:6px; }
+.empty-state p{ color:var(--text-dim); font-size:13.5px; margin-bottom:20px; }
+
+.member-select-row{ display:flex; flex-wrap:wrap; gap:10px; }
+.member-select-chip{
+  display:flex; align-items:center; gap:9px; padding:10px 16px; border-radius:10px; border:1.5px solid var(--border-strong);
+  background:var(--bg-elev-2); font-size:13.5px; font-weight:500; cursor:pointer; transition:border-color .2s, background .2s;
+}
+.member-select-chip input{ display:none; }
+.member-select-chip:has(input:checked){ border-color:var(--amber); background:rgba(255,176,32,0.1); }
+
+.fund-log-row{ display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px solid var(--border); }
+.fund-log-row:last-of-type{ border-bottom:none; }
+.fund-log-icon{ width:34px; height:34px; border-radius:9px; background:rgba(0,217,163,0.1); color:var(--mint); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.fund-log-icon svg{ width:16px; height:16px; }
+.fund-log-desc{ flex:1; min-width:0; }
+.fund-log-desc .t1{ font-size:14px; font-weight:600; }
+.fund-log-desc .t2{ font-size:11.5px; color:var(--text-dimmer); margin-top:2px; }

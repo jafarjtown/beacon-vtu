@@ -23,6 +23,7 @@ urlpatterns = [
     path('services/', include('services.urls')),
     path('links/', include('links.urls')),
     path('notifications/', include('notifications.urls')),
+    path('commons/', include('commons.urls')),
     path('api/data/variations/', vtu.data_plans, name="api-data-plans")
 ]
 

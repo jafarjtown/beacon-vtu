@@ -25,6 +25,7 @@
 {% block extra_head %}{% endblock %}
 </head>
 <body{% block body_attrs %}{% endblock %}>
+  <div id="pageLoader"></div>
 {% include "partials/splash.html" %}
 <div class="app-shell">
 
@@ -44,22 +45,25 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
         Dashboard
       </a>
+      
       <a href="{% url 'services:list' %}" class="nav-link {% if active_nav == 'buy' %}active{% endif %}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>
-        Buy a service
+        Top Up
       </a>
+      
+      <div class="nav-label">Beacon Claim Links</div>
       <a href="{% url 'links:my_links' %}" class="nav-link {% if active_nav == 'claims' %}active{% endif %}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg>
-        Claim links
+        My links
       </a>
-      <a href="{% url 'transactions:history' %}" class="nav-link {% if active_nav == 'transactions' %}active{% endif %}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg>
-        Transactions
-      </a>
-      <a href="{% url 'wallet:fund' %}" class="nav-link {% if active_nav == 'wallet' %}active{% endif %}">
+      
+      
+      <div class="nav-label">Beacon Family</div>
+      <a href="{% url 'beacon_family:list' %}" class="nav-link {% if active_nav == 'wallet' %}active{% endif %}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-        Fund wallet
+        My family
       </a>
+      
 
       <div class="nav-label">Account</div>
       <a href="{% url 'accounts:settings' %}" class="nav-link {% if active_nav == 'settings' %}active{% endif %}">
@@ -122,6 +126,96 @@
   </div>
 </div>
 
+<dialog id="myDialog">
+  <div id="beaconSplash" class="beacon-splash dialog-splash" aria-hidden="true">
+  <div class="beacon-splash-mark">
+    <span></span><span></span><span></span><span></span>
+  </div>
+  <p>Processing, please wait.</p>
+  </div>
+  <style>
+    .dialog-splash {
+      background:#0b0e1fb1;
+    }
+    body.dialog-open{
+      overflow: hidden;
+    }
+
+
+    #pageLoader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    z-index: 9999;
+    overflow: hidden;
+    display: none;
+}
+
+#pageLoader::before {
+    content: "";
+    position: absolute;
+    width: 30%;
+    height: 100%;
+    background: #fdc501;
+    animation: loading 1s infinite ease-in-out;
+}
+
+@keyframes loading {
+    0% {
+        left: -30%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+#pageLoader.loading {
+    display: block;
+  }
+  </style>
+</dialog>
+
+<script>
+  function loadingDialogStart(event) {
+    const dialog = document.querySelector("#myDialog");
+    const button = event.currentTarget;
+    const form = button.form;
+
+    if (form && !form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    dialog.showModal();
+    document.body.classList.add("dialog-open");
+  }
+  document.querySelectorAll("button[startLoading]").forEach(trigger => {
+    trigger.addEventListener("click", loadingDialogStart);
+  });
+
+  const pageLoader = document.querySelector("#pageLoader");
+
+document.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", function () {
+        const href = this.getAttribute("href");
+
+        if (
+            !href ||
+            href.startsWith("#") ||
+            this.target === "_blank" ||
+            this.hasAttribute("download")
+        ) {
+            return;
+        }
+
+        pageLoader.classList.add("loading");
+    });
+});
+</script>
+  
 <script>
   const burger = document.getElementById('burgerBtn');
   const sidebar = document.getElementById('sidebar');

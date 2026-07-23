@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}New schedule{% endblock %}
+{% block page_title %}New schedule{% endblock %}
+{% block page_subtitle %}<p>{{ family.name }} — set it once, Beacon handles the rest.</p>{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/family.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="narrow-shell">
+  <div class="buy-card">
+    {% if presets %}
+    <h3>What should this pay for?</h3>
+    <p class="hint">Uses a saved service, so it already knows who and where.</p>
+
+    <form method="post" action="{% url 'beacon_family:create_schedule' family_id=family.id %}" id="scheduleForm">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="id_preset">Saved service</label>
+        <select name="preset" id="id_preset" class="form-select">
+          {% for preset in presets %}
+            <option data-category="{{ preset.service_type }}" data-api_id="{{ preset.provider.api_id }}" value="{{ preset.id }}">{{ preset.label }} — {{ preset.membership.user }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group" id="id_amount_wrapper">
+        <label for="id_amount">Amount</label>
+        <input type="number" step="0.01" name="amount" id="id_amount" class="form-input" placeholder="e.g. 3000" min="1" required>
+      </div>
+
+      <div class="form-group" id="id_data_wrapper">
+        <label for="id_service_plan">Data plan</label>
+        <select name="service_plan" id="id_service_plan" class="form-select">
+          <option>Select Plan</option>
+          
+        </select>
+      </div>
+
+
+      <div class="form-group">
+        <label for="id_frequency">Repeats</label>
+        <select name="frequency" id="id_frequency" class="form-select">
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly" selected>Monthly</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="dayOfWeekGroup" style="display:none;">
+        <label for="id_dow">Day of the week</label>
+        <select name="day_of_week" id="id_dow" class="form-select">
+          <option value="0">Monday</option>
+          <option value="1">Tuesday</option>
+          <option value="2">Wednesday</option>
+          <option value="3">Thursday</option>
+          <option value="4">Friday</option>
+          <option value="5">Saturday</option>
+          <option value="6">Sunday</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="dayOfMonthGroup">
+        <label for="id_dom">Day of the month</label>
+        <input type="number" name="day_of_month" id="id_dom" class="form-input" min="1" max="31" value="1">
+        <div class="field-hint">Shorter months land on the last real day instead.</div>
+      </div>
+
+      <button startLoading type="submit" class="btn btn-primary btn-block">Create schedule →</button>
+    </form>
+
+    {% else %}
+    <div class="empty-state" style="border:none; padding:20px 0;">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+      <h3>No saved services yet</h3>
+      <p>Add a saved service first, then come back to schedule it.</p>
+      <a href="{% url 'beacon_family:create_preset' family_id=family.id %}" class="btn btn-primary">Add a saved service</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  var freqSelect = document.getElementById('id_frequency');
+  var dowGroup = document.getElementById('dayOfWeekGroup');
+  var domGroup = document.getElementById('dayOfMonthGroup');
+  var presetSelect = document.getElementById("id_preset")
+  
+  function syncFrequencyFields(){
+    if (!freqSelect) return;
+    var val = freqSelect.value;
+    dowGroup.style.display = val === 'weekly' ? 'block' : 'none';
+    domGroup.style.display = val === 'monthly' ? 'block' : 'none';
+  }
+
+  function updateAmountDisplay() {
+    let selectedOpt = presetSelect.selectedOptions[0]
+    let amountDivWrapper = document.querySelector('#id_amount_wrapper')
+    let input = amountDivWrapper.querySelector('input')
+    let data_input_wr = document.querySelector("#id_data_wrapper")
+
+    
+    amountDivWrapper.hidden = !(selectedOpt.dataset.category == 'airtime')
+    data_input_wr.hidden = (selectedOpt.dataset.category == 'airtime')
+    
+    input.required = (selectedOpt.dataset.category == 'airtime')
+  }
+
+  if (freqSelect) {
+    freqSelect.addEventListener('change', syncFrequencyFields);
+    syncFrequencyFields();
+  }
+
+  presetSelect.addEventListener("change", updateAmountDisplay)
+  updateAmountDisplay()
+
+  document.querySelector('#id_preset').addEventListener('change', i => {
+    let selectedOpt = i.target.selectedOptions[0]
+    let providerId = selectedOpt.dataset.api_id
+    updateDataPlan(providerId)
+  });
+  
+  
+  async function updateDataPlan(providerId) {
+    if(providerId == "Select Network") return
+    let selectEle = document.getElementById("id_service_plan")
+    selectEle.innerHTML = "<option>Loading plans</option>"
+    let request = await fetch(`{% url 'api-data-plans' %}?serviceID=${providerId}`)
+    let response = await request.json()
+    if(request.ok) {
+      selectEle.innerHTML = "<option>Select plan</option>"
+      response["variations"].forEach(variation => {
+        let option = document.createElement("option")
+        option.value = variation["variation_code"]
+        option.textContent = variation["name"]
+        option.className = "data-option"
+
+        option.setAttribute("data-amount", variation["variation_amount"])
+        
+        selectEle.appendChild(option)
+        })
+      }
+    }
+
+</script>
+{% endblock %}
